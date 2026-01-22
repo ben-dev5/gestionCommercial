@@ -1,7 +1,7 @@
 from django.db import models
 
 from commons.models.contact_models import Contact
-from sales.models.product_models import Product
+from products.models.product_models import Product
 from sales.models.sales_order_models import SalesOrder
 
 

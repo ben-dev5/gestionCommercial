@@ -1,8 +1,11 @@
+
+
 from django.db import models
 
 from commons.models.contact_models import Contact
+from invoicing.models.enums import InvoiceOrderLineStatus
 from invoicing.models.invoice_models import Invoice
-from sales.models.product_models import Product
+from products.models.product_models import Product
 
 
 class InvoiceOrderLine(models.Model):
@@ -14,4 +17,4 @@ class InvoiceOrderLine(models.Model):
     tax = models.FloatField()
     quantity = models.IntegerField()
     date = models.DateField()
-    status = models.BooleanField(default=False)
+    status = models.CharField(max_length=20, choices=InvoiceOrderLineStatus.choices, default=InvoiceOrderLineStatus.WAITING, )
