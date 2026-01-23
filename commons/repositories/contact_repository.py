@@ -1,9 +1,7 @@
 from commons.models import Contact
 
 class ContactRepository:
-    def __init__(self):
-        pass
-
+   
     def create_contact(self, contact_id, first_name, last_name, email,
                        phone, type, siret, address, city, state, zip_code):
         return Contact.objects.create(

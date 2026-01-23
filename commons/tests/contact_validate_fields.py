@@ -47,6 +47,7 @@ class ContactValidateFieldsTests(TestCase):
 
     def test_type_contact_field(self):
         # Créer un contact client
+        self.service = ContactService()
         contact_client = self.service.create_contact(
             contact_id="3",
             first_name="Alice",
@@ -62,6 +63,7 @@ class ContactValidateFieldsTests(TestCase):
         )
 
         # Créer un contact fournisseur
+        self.service = ContactService()
         contact_fournisseur = self.service.create_contact(
             contact_id="4",
             first_name="Bob",
