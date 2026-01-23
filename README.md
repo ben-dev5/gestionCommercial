@@ -12,9 +12,9 @@
 - Nous avons maintenant un projet crée.
   Django utilise l'architecture ci-dessous :
 
-      * djangoproject/
+      * gestionCommercial/
             * manage.py
-            * hestiaCommercial/
+            * hestiaCrm/
                   *  __init__.py
                   *  settings.py
                   *  urls.py
@@ -29,48 +29,47 @@
    De tel sorte que notre architecture actuel ressemble à ceci (chaque app représente un domaine métier)
   
                       
-      * djangoproject/
+      * gestionCommercial/
             * manage.py
-            * hestiaCommercial/
-                  *  Apps/
-                      * commons/
-                          * models/
-                          * repositories/
-                          * services/
-                          * templates/
-                          * views/
-                      * invoicing/
-                          * models/
-                          * repositories/
-                          * services/
-                          * templates/
-                          * views/
-                      * purchases/
-                          * models/
-                          * repositories/
-                          * services/
-                          * templates/
-                          * views/
-                      * sales/
-                          * models/
-                          * repositories/
-                          * services/
-                          * templates/
-                          * views/
-                      * services/
-                          * models/
-                          * repositories/
-                          * services/
-                          * templates/
-                          * views/
-                      * static/
-                      * tests/
+            * hestiaCrm/
                   *  __init__.py
                   *  settings.py
                   *  urls.py
                   *  asgi.py
-                  *  wsgi.py
-
+                  *  wsgi.py        
+            * commons/
+                  * models/
+                  * repositories/
+                  * services/
+                  * templates/
+                  * views/
+            * invoicing/
+                 * models/
+                 * repositories/
+                 * services/
+                 * templates/
+                 * views/
+            * purchases/
+                 * models/
+                 * repositories/
+                 * services/
+                 * templates/
+                 * views/
+            * sales/
+                 * models/
+                 * repositories/
+                 * services/
+                 * templates/
+                 * views/
+            * products/
+                * models/
+                * repositories/
+                * services/
+                * templates/
+                * views/
+             * static/
+             * tests/
+                 
 
 - ## Surcouche Repository
   Afin de ne pas faire appel directement à la BDD avec l'ORM de Django, on crée un repository, qui lui, appelle la BDD avec des fonctions définis.
