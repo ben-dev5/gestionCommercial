@@ -4,9 +4,10 @@ from commons.models import Contact
 
 class ContactValidateFieldsTests(TestCase):
     def setUp(self):
-        self.contact = Contact.services.create_contact(
+        self.service = ContactService()
+        self.contact = self.service.create_contact(
             contact_id = "2",
-            first_name="John",
+            first_name="john",
             last_name="Doe",
             email="",
             phone="+1 555 555 555",
