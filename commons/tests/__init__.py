@@ -1,1 +1,1 @@
-from contact_validate_fields import *
+from .contact_validate_fields import *

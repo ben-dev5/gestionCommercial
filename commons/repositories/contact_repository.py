@@ -1,15 +1,12 @@
-import repo
+from commons.models import Contact
 
-from commons.repositories.contact_repository import ContactRepository
-
-
-class ContactService:
+class ContactRepository:
     def __init__(self):
-        self.repo = ContactRepository()
+        pass
 
     def create_contact(self, contact_id, first_name, last_name, email,
                        phone, type, siret, address, city, state, zip_code):
-        return self.repo.create_contact(
+        return Contact.objects.create(
             contact_id=contact_id,
             first_name=first_name,
             last_name=last_name,
@@ -23,5 +20,11 @@ class ContactService:
             zip_code=zip_code
         )
 
+    def get_contact_id(self, contact_id):
+        return Contact.objects.get().contact_id
+    def get_contact_first_name(self, contact_id):
+        return Contact.objects.get().first_name
     def delete_contact(self, contact_id):
-        repo.delete_contact(contact_id)
+        contact = Contact.objects.get(id=contact_id)
+        contact.delete()
+        return True
