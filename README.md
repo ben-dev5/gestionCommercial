@@ -94,7 +94,11 @@
                 },
             },
         ]
-        
+
+
+## Test-driven development méthode
+Pour la suite du projet nous choisirons d'utiliser la méthode de Test-driven development qui consiste en la rédaction de tests avant de coder les fonctionnalités elles-mêmes. 
+Ainsi on commence par le dossiers tests puis on crée le service et enfin le repository, ainsi toute la chaîne est opérationel. Et depuis les models, en passant par le repo et le services on récupère via les tests les données. 
 
 
   
