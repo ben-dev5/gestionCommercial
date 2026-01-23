@@ -3,9 +3,15 @@
 from django.db import models
 
 from commons.models.contact_models import Contact
-from invoicing.models.enums import InvoiceOrderLineStatus
 from invoicing.models.invoice_models import Invoice
 from products.models.product_models import Product
+
+
+class InvoiceOrderLineStatus(models.TextChoices):
+    MULTIPLE = "MULTIPLE", "Paiement en plusieurs fois"
+    PAID = "PAID", "Réglé"
+    WAITING = "WAITING", "En attente"
+    CANCELLED = 'CANCELLED', 'Annulée'
 
 
 class InvoiceOrderLine(models.Model):
@@ -15,6 +21,7 @@ class InvoiceOrderLine(models.Model):
     contact_id = models.ForeignKey(Contact, on_delete=models.CASCADE)
     price_ht = models.FloatField()
     tax = models.FloatField()
+    price_tax = models.FloatField()
     quantity = models.IntegerField()
     date = models.DateField()
-    status = models.CharField(max_length=20, choices=InvoiceOrderLineStatus.choices, default=InvoiceOrderLineStatus.WAITING, )
+    status = models.CharField(max_length=20, choices=InvoiceOrderLineStatus.choices, default=InvoiceOrderLineStatus.WAITING )
