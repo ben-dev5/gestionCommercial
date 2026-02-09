@@ -3,25 +3,61 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>{% block title %}Gestion des Contacts{% endblock %}</title>
+    <title>Hestia CRM</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
         body {
             background-color: white;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
         }
+
         .navbar {
             box-shadow: 0 2px 4px rgba(0,0,0,.1);
         }
+
         .card {
             box-shadow: 0 0 10px rgba(0,0,0,.1);
             border: none;
         }
+
+        .sidebar {
+            background-color: #f8f9fa;
+            border-right: 1px solid #dee2e6;
+            min-height: calc(100vh - 120px);
+            padding: 20px 0;
+        }
+
+        .sidebar .nav-link {
+            color: #495057;
+            padding: 10px 20px;
+            border-left: 4px solid transparent;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover {
+            background-color: #e9ecef;
+            border-left-color: #6c757d;
+            color: #212529;
+        }
+
+        .sidebar .nav-link.active {
+            background-color: #e9ecef;
+            border-left-color: #6c757d;
+            color: #212529;
+            font-weight: bold;
+        }
+
+        .main-content {
+            flex: 1;
+        }
     </style>
 </head>
 <body>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary mb-4">
-        <div class="container">
+    <nav class="navbar navbar-expand-lg navbar-dark bg-secondary">
+        <div class="container-fluid">
             <a class="navbar-brand" href="{% url 'commons:contact_list' %}">
                 <i class="bi bi-person-lines-fill"></i> Hestia CRM
             </a>
@@ -45,23 +81,55 @@
         </div>
     </nav>
 
-    <div class="container">
-        {% if messages %}
-            {% for message in messages %}
-                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            {% endfor %}
-        {% endif %}
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar à gauche -->
+            <nav class="col-md-2 sidebar d-md-block">
+                <div class="nav flex-column">
+                    <h6 class="px-20 py-2 text-muted text-uppercase" style="padding-left: 20px; font-size: 0.75rem; font-weight: bold;">Menu</h6>
 
-        {% block content %}
-        {% endblock %}
+                    <a class="nav-link {% if request.resolver_match.name == 'commons:contact_list' %}active{% endif %}" href="{% url 'commons:contact_list' %}">
+                        <i class="bi bi-people-fill"></i> Contacts
+                    </a>
+
+                    <!-- Placeholder pour futures pages -->
+                    <hr class="my-2">
+                    <h6 class="px-20 py-2 text-muted text-uppercase" style="padding-left: 20px; font-size: 0.75rem; font-weight: bold;">Autres</h6>
+
+                    <a class="nav-link disabled" href="#" title="À venir">
+                        <i class="bi bi-graph-up"></i> Tableau de bord
+                    </a>
+                    <a class="nav-link disabled" href="#" title="À venir">
+                        <i class="bi bi-box-seam"></i> Produits
+                    </a>
+                    <a class="nav-link disabled" href="#" title="À venir">
+                        <i class="bi bi-receipt"></i> Factures
+                    </a>
+                </div>
+            </nav>
+
+            <!-- Contenu principal à droite -->
+            <main class="col-md-10 main-content">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="margin: 20px 20px 0 20px;">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+
+                <div style="padding: 20px;">
+                    {% block content %}
+                    {% endblock %}
+                </div>
+            </main>
+        </div>
     </div>
 
     <footer class="mt-5 py-3 bg-light text-center">
         <div class="container">
-            <span class="text-muted">© Gestion Commerciale</span>
+            <span class="text-muted">© 2026 Gestion Commerciale</span>
         </div>
     </footer>
 
