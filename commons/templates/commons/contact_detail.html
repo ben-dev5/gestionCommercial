@@ -1,0 +1,114 @@
+{% extends 'commons/base.html' %}
+
+{% block title %}Détail du Contact{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <a href="{% url 'commons:contact_list' %}" class="btn btn-secondary mb-3">
+            <i class="bi bi-arrow-left"></i> Retour à la liste
+        </a>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-8 offset-md-2">
+        <div class="card">
+            <div class="card-header bg-secondary text-white">
+                <h3 class="mb-0">
+                    <i class="bi bi-person-circle"></i>
+                    {{ contact.first_name }} {{ contact.last_name }}
+                </h3>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Prénom</h6>
+                        <p class="lead">{{ contact.first_name }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Nom</h6>
+                        <p class="lead">{{ contact.last_name }}</p>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6 class="text-muted"><i class="bi bi-envelope"></i> Email</h6>
+                        <p>
+                            <a href="mailto:{{ contact.email }}">{{ contact.email }}</a>
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted"><i class="bi bi-telephone"></i> Téléphone</h6>
+                        <p>
+                            <a href="tel:{{ contact.phone }}">{{ contact.phone }}</a>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6 class="text-muted"><i class="bi bi-tag"></i> Type</h6>
+                        <p>
+                            {% if contact.type == 'client' %}
+                                <span class="badge bg-success">Client</span>
+                            {% elif contact.type == 'fournisseur' %}
+                                <span class="badge bg-info">Fournisseur</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ contact.type }}</span>
+                            {% endif %}
+                        </p>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted"><i class="bi bi-building"></i> SIRET</h6>
+                        <p>{{ contact.siret }}</p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <h5 class="mb-3"><i class="bi bi-geo-alt"></i> Adresse</h5>
+                <div class="row mb-3">
+                    <div class="col-md-12">
+                        <h6 class="text-muted">Rue</h6>
+                        <p>{{ contact.address }}</p>
+                    </div>
+                </div>
+
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Ville</h6>
+                        <p>{{ contact.city }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6 class="text-muted">Région</h6>
+                        <p>{{ contact.state }}</p>
+                    </div>
+                    <div class="col-md-3">
+                        <h6 class="text-muted">Code Postal</h6>
+                        <p>{{ contact.zip_code }}</p>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'commons:contact_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-list"></i> Liste des contacts
+                    </a>
+                    <div>
+                        <a href="{% url 'commons:contact_update' contact.contact_id %}" class="btn btn-warning">
+                            <i class="bi bi-pencil"></i> Modifier
+                        </a>
+                        <a href="{% url 'commons:contact_delete' contact.contact_id %}" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Supprimer
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

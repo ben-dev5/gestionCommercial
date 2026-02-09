@@ -1,0 +1,120 @@
+{% extends 'commons/base.html' %}
+
+{% block title %}Liste des Contacts{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-md-12">
+        <div class="d-flex justify-content-between align-items-center">
+            <h1><i class="bi bi-people-fill"></i> Liste des Contacts</h1>
+            <a href="{% url 'commons:contact_create' %}" class="btn btn-secondary">
+                <i class="bi bi-plus-circle"></i> Nouveau Contact
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-12">
+        <form method="get" class="d-flex gap-2" style="align-items: center;">
+            <input type="text" name="search" class="form-control form-control-sm" placeholder="Rechercher par nom, prénom ou email..." value="{{ request.GET.search }}" style="padding: 0.4rem 0.75rem; font-size: 0.9rem;">
+            <button type="submit" class="btn btn-secondary btn-sm" title="Chercher">
+                <i class="bi bi-search"></i>
+            </button>
+            {% if request.GET.search %}
+                <a href="{% url 'commons:contact_list' %}" class="btn btn-outline-secondary btn-sm" title="Réinitialiser">
+                    <i class="bi bi-x-circle"></i>
+                </a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="card">
+            <div class="card-body">
+                {% if contacts %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Nom</th>
+                                    <th>Prénom</th>
+                                    <th>Email</th>
+                                    <th>Téléphone</th>
+                                    <th>Type</th>
+                                    <th>Ville</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for contact in contacts %}
+                                <tr>
+                                    <td>{{ contact.contact_id }}</td>
+                                    <td>{{ contact.last_name }}</td>
+                                    <td>{{ contact.first_name }}</td>
+                                    <td>
+                                        <a href="mailto:{{ contact.email }}">
+                                            <i class="bi bi-envelope"></i> {{ contact.email }}
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <i class="bi bi-telephone"></i> {{ contact.phone }}
+                                    </td>
+                                    <td>
+                                        {% if contact.type == 'client' %}
+                                            <span class="badge bg-success">Client</span>
+                                        {% elif contact.type == 'fournisseur' %}
+                                            <span class="badge bg-info">Fournisseur</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">{{ contact.type }}</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ contact.city }}</td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'commons:contact_detail' contact.contact_id %}"
+                                               class="btn btn-sm btn-outline-info"
+                                               title="Voir">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+                                            <a href="{% url 'commons:contact_update' contact.contact_id %}"
+                                               class="btn btn-sm btn-outline-warning"
+                                               title="Modifier">
+                                                <i class="bi bi-pencil"></i>
+                                            </a>
+                                            <a href="{% url 'commons:contact_delete' contact.contact_id %}"
+                                               class="btn btn-sm btn-outline-danger"
+                                               title="Supprimer">
+                                                <i class="bi bi-trash"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-info text-center" role="alert">
+                        <i class="bi bi-info-circle"></i>
+                        Aucun contact trouvé.
+                        <a href="{% url 'commons:contact_create' %}" class="alert-link">Créer le premier contact</a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row mt-3">
+    <div class="col-md-12">
+        <div class="alert alert-light">
+            <strong>Total : </strong> {{ contacts|length }} contact(s)
+        </div>
+    </div>
+</div>
+{% endblock %}
+

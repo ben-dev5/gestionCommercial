@@ -1,0 +1,44 @@
+{% extends 'commons/base.html' %}
+
+{% block title %}Confirmer la suppression{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-6 offset-md-3">
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h3 class="mb-0">
+                    <i class="bi bi-exclamation-triangle"></i> Confirmation de suppression
+                </h3>
+            </div>
+            <div class="card-body">
+                <p class="lead">Êtes-vous sûr de vouloir supprimer ce contact ?</p>
+
+                <div class="alert alert-warning mb-3">
+                    <strong><i class="bi bi-person"></i> {{ object.first_name }} {{ object.last_name }}</strong>
+                    <br>
+                    <small class="text-muted">{{ object.email }}</small>
+                </div>
+
+                <p class="text-danger">
+                    <i class="bi bi-exclamation-circle"></i>
+                    Cette action est irréversible. Le contact sera définitivement supprimé.
+                </p>
+
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="{% url 'commons:contact_list' %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </a>
+                    <form method="post" style="display: inline;">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Supprimer définitivement
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
