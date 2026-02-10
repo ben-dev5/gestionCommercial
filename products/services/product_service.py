@@ -6,8 +6,8 @@ class ProductService:
         self.repo = ProductRepository()
 
     def validate_product_data(self, product_id, product_description, price_ht, tax, price_it):
-        # Vérifier que product_id est positif
-        if product_id < 0:
+        # Vérifier que product_id est positif (si fourni)
+        if product_id is not None and product_id < 0:
             raise ValueError("product_id doit être positif")
 
         # Vérifier que la description n'est pas vide

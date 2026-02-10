@@ -99,7 +99,7 @@
                     <a class="nav-link disabled" href="#" title="À venir">
                         <i class="bi bi-graph-up"></i> Tableau de bord
                     </a>
-                    <a class="nav-link disabled" href="#" title="À venir">
+                    <a class="nav-link {% if request.resolver_match.name == 'products:product_list' %}active{% endif %}" href="{% url 'products:product_list' %}">
                         <i class="bi bi-box-seam"></i> Produits
                     </a>
                     <a class="nav-link disabled" href="#" title="À venir">

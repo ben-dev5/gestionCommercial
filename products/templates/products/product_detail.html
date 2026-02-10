@@ -1,0 +1,53 @@
+{% extends "commons/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{{ product.product_description }}</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'products:product_update' product.pk %}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Modifier
+            </a>
+            <a href="{% url 'products:product_delete' product.pk %}" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Supprimer
+            </a>
+            <a href="{% url 'products:product_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <h5>ID Produit</h5>
+                    <p>{{ product.product_id }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5>Description</h5>
+                    <p>{{ product.product_description }}</p>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <h5>Prix HT</h5>
+                    <p>{{ product.price_ht }}€</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Taxe</h5>
+                    <p>{{ product.tax }}%</p>
+                </div>
+                <div class="col-md-4">
+                    <h5>Prix TTC</h5>
+                    <p class="text-success fw-bold">{{ product.price_it }}€</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,60 @@
+{% extends "commons/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Produits</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'products:product_create' %}" class="btn btn-secondary">
+                <i class="bi bi-plus-circle"></i> Nouveau produit
+            </a>
+        </div>
+    </div>
+
+    {% if products %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Description</th>
+                    <th>Prix HT</th>
+                    <th>Taxe</th>
+                    <th>Prix TTC</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for product in products %}
+                <tr>
+                    <td>{{ product.product_id }}</td>
+                    <td>{{ product.product_description }}</td>
+                    <td>{{ product.price_ht }}€</td>
+                    <td>{{ product.tax }}%</td>
+                    <td>{{ product.price_it }}€</td>
+                    <td>
+                        <a href="{% url 'products:product_detail' product.pk %}" class="btn btn-sm btn-info">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'products:product_update' product.pk %}" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'products:product_delete' product.pk %}" class="btn btn-sm btn-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        Aucun produit trouvé. <a href="{% url 'products:product_create' %}">Créer un produit</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
