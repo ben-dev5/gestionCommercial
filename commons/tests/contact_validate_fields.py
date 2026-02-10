@@ -1,7 +1,6 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from commons.services.contact_service import ContactService
-from commons.models import Contact
 
 class ContactValidateFieldsTests(TestCase):
     def setUp(self):
@@ -99,4 +98,4 @@ class ContactValidateFieldsTests(TestCase):
         )
 
         self.service.delete_contact(contact.contact_id)
-        self.assertEqual(Contact.objects.count(), 1)
+        self.assertEqual(self.service.get_all_contacts().count(), 1)
