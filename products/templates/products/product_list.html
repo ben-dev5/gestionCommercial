@@ -35,13 +35,13 @@
                     <td>{{ product.tax }}%</td>
                     <td>{{ product.price_it }}€</td>
                     <td>
-                        <a href="{% url 'products:product_detail' product.pk %}" class="btn btn-sm btn-info">
+                        <a href="{% url 'products:product_detail' product.pk %}" class="btn btn-sm btn-outline-info">
                             <i class="bi bi-eye"></i>
                         </a>
-                        <a href="{% url 'products:product_update' product.pk %}" class="btn btn-sm btn-warning">
+                        <a href="{% url 'products:product_update' product.pk %}" class="btn btn-sm btn-outline-warning">
                             <i class="bi bi-pencil"></i>
                         </a>
-                        <a href="{% url 'products:product_delete' product.pk %}" class="btn btn-sm btn-danger">
+                        <a href="{% url 'products:product_delete' product.pk %}" class="btn btn-sm btn-outline-danger">
                             <i class="bi bi-trash"></i>
                         </a>
                     </td>

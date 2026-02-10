@@ -22,10 +22,10 @@ class ProductService:
         if tax < 0 or tax > 100:
             raise ValueError("tax doit être entre 0 et 100")
 
-        # Vérifier que price_it correspond au calcul
+        # Vérifier que price_it correspond au calcul (tolérance de 0.01 pour arrondi)
         expected_price_it = price_ht * (1 + tax / 100)
-        if abs(price_it - expected_price_it) > 0:
-            raise ValueError(f"price_it doit être égal à {expected_price_it}")
+        if abs(price_it - expected_price_it) > 0.01:
+            raise ValueError(f"price_it doit être égal à {round(expected_price_it, 2)}")
 
     def create_product(self, product_id, product_description, price_ht, tax, price_it):
         self.validate_product_data(product_id, product_description, price_ht, tax, price_it)

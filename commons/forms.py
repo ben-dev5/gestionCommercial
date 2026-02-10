@@ -1,5 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
+
+from commons.models import Contact
 from commons.services.contact_service import ContactService
 
 def validate_siret(value):
@@ -22,7 +24,7 @@ class ContactForm(forms.ModelForm):
     )
 
     class Meta:
-        model = ContactService().get_contact_by_id(4)
+        model = Contact
         fields = ['first_name', 'last_name', 'email', 'phone', 'type', 'siret', 'address', 'city', 'state', 'zip_code']
         widgets = {
             'first_name': forms.TextInput(attrs={
