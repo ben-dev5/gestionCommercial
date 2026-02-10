@@ -1,6 +1,5 @@
 from django.test import TestCase, Client
 from django.urls import reverse
-from commons.models import Contact
 from commons.services.contact_service import ContactService
 
 
@@ -58,7 +57,7 @@ class ContactViewsTests(TestCase):
         }
         response = self.client.post(reverse('commons:contact_create'), data)
         self.assertEqual(response.status_code, 302)  # Redirection après création
-        self.assertEqual(Contact.objects.count(), 2)
+        self.assertEqual(self.service.get_all_contacts().count(), 2)
 
     def test_contact_update_view(self):
         # Test modif d'un contact
@@ -83,4 +82,4 @@ class ContactViewsTests(TestCase):
         # Test suppr d'un contact
         response = self.client.post(reverse('commons:contact_delete', args=[self.contact.contact_id]))
         self.assertEqual(response.status_code, 302)
-        self.assertEqual(Contact.objects.count(), 0)
+        self.assertEqual(self.service.get_all_contacts().count(), 0)
