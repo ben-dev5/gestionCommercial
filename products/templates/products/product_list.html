@@ -18,22 +18,30 @@
         <table class="table table-hover">
             <thead class="table-light">
                 <tr>
-                    <th>ID</th>
                     <th>Description</th>
                     <th>Prix HT</th>
                     <th>Taxe</th>
                     <th>Prix TTC</th>
+                    <th>Type</th>
                     <th>Actions</th>
                 </tr>
             </thead>
             <tbody>
                 {% for product in products %}
                 <tr>
-                    <td>{{ product.product_id }}</td>
                     <td>{{ product.product_description }}</td>
                     <td>{{ product.price_ht }}€</td>
                     <td>{{ product.tax }}%</td>
                     <td>{{ product.price_it }}€</td>
+                    <td>
+                        {% if product.product_type == 'achat' %}
+                            <span class="badge bg-info">Achat</span>
+                        {% elif product.product_type == 'vente' %}
+                            <span class="badge bg-success">Vente</span>
+                        {% elif product.product_type == 'achat/vente' %}
+                            <span class="badge bg-warning">Achat/Vente</span>
+                        {% endif %}
+                    </td>
                     <td>
                         <a href="{% url 'products:product_detail' product.pk %}" class="btn btn-sm btn-outline-info">
                             <i class="bi bi-eye"></i>

@@ -45,7 +45,8 @@ class ProductCreateView(TemplateView):
                     product_description=form.cleaned_data['product_description'],
                     price_ht=form.cleaned_data['price_ht'],
                     tax=form.cleaned_data['tax'],
-                    price_it=form.cleaned_data['price_it']
+                    price_it=form.cleaned_data['price_it'],
+                    product_type=form.cleaned_data['product_type']
                 )
                 return redirect('products:product_list')
             except ValueError as e:
@@ -71,6 +72,7 @@ class ProductUpdateView(TemplateView):
                 'price_ht': product.price_ht,
                 'tax': product.tax,
                 'price_it': product.price_it,
+                'product_type': product.product_type,
             })
             context['form'] = form
 
@@ -89,7 +91,8 @@ class ProductUpdateView(TemplateView):
                     product_description=form.cleaned_data['product_description'],
                     price_ht=form.cleaned_data['price_ht'],
                     tax=form.cleaned_data['tax'],
-                    price_it=form.cleaned_data['price_it']
+                    price_it=form.cleaned_data['price_it'],
+                    product_type=form.cleaned_data['product_type']
                 )
                 return redirect('products:product_list')
             except ValueError as e:

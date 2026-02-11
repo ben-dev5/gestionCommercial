@@ -22,11 +22,7 @@
     <div class="card">
         <div class="card-body">
             <div class="row mb-3">
-                <div class="col-md-6">
-                    <h5>ID Produit</h5>
-                    <p>{{ product.product_id }}</p>
-                </div>
-                <div class="col-md-6">
+                <div class="col-md-12">
                     <h5>Description</h5>
                     <p>{{ product.product_description }}</p>
                 </div>
@@ -44,6 +40,21 @@
                 <div class="col-md-4">
                     <h5>Prix TTC</h5>
                     <p class="text-success fw-bold">{{ product.price_it }}€</p>
+                </div>
+            </div>
+
+            <div class="row mb-3">
+                <div class="col-md-12">
+                    <h5>Type de produit</h5>
+                    <p>
+                        {% if product.product_type == 'achat' %}
+                            <span class="badge bg-info">Achat chez fournisseur</span>
+                        {% elif product.product_type == 'vente' %}
+                            <span class="badge bg-success">Vente au client</span>
+                        {% elif product.product_type == 'achat/vente' %}
+                            <span class="badge bg-warning">Achat et vente</span>
+                        {% endif %}
+                    </p>
                 </div>
             </div>
         </div>

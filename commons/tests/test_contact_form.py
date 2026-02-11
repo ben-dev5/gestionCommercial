@@ -245,7 +245,6 @@ class ContactFormValidationTests(TestCase):
         form = ContactForm(data=data)
         self.assertTrue(form.is_valid())
 
-    # Tests de la fonction validate_siret directement
     def test_validate_siret_function_valid(self):
         try:
             validate_siret('12345678901234')

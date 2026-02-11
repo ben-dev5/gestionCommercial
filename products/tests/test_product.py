@@ -13,7 +13,8 @@ class ProductValidateFields(TestCase):
             product_description = "séminaire de formation",
             price_ht = 1000,
             tax = 20,
-            price_it = 1200
+            price_it = 1200,
+            product_type='achat/vente'
         )
 
     def test_validate_product_field(self):
@@ -44,7 +45,8 @@ class ProductValidateFields(TestCase):
                 product_description = "séminaire de formation",
                 price_ht = 2000,
                 tax = 20,
-                price_it = 2400
+                price_it = 2400,
+                product_type='achat/vente'
             )
 
     def test_price_ht_must_be_positive(self):
@@ -55,7 +57,8 @@ class ProductValidateFields(TestCase):
                 product_description="produit négatif",
                 price_ht=-100,
                 tax=20,
-                price_it=0
+                price_it=0,
+                product_type='achat/vente'
             )
 
     def test_tax_must_be_between_0_and_100(self):
@@ -66,7 +69,8 @@ class ProductValidateFields(TestCase):
                 product_description="taxe invalide",
                 price_ht=1000,
                 tax=150,
-                price_it=2500
+                price_it=2500,
+                product_type='achat/vente'
             )
 
     def test_product_id_must_be_positive(self):
@@ -77,7 +81,8 @@ class ProductValidateFields(TestCase):
                 product_description="id négatif",
                 price_ht=1000,
                 tax=20,
-                price_it=1200
+                price_it=1200,
+                product_type='achat/vente'
             )
 
 
@@ -89,7 +94,8 @@ class ProductUpdateTests(TestCase):
             product_description="produit original",
             price_ht=1000,
             tax=20,
-            price_it=1200
+            price_it=1200,
+            product_type='achat/vente'
         )
 
     def test_update_product_price(self):
@@ -99,7 +105,8 @@ class ProductUpdateTests(TestCase):
             product_description="produit original",
             price_ht=1500,
             tax=20,
-            price_it=1800
+            price_it=1800,
+            product_type='achat/vente'
         )
         self.assertEqual(updated_product.price_ht, 1500)
 
@@ -110,7 +117,8 @@ class ProductUpdateTests(TestCase):
             product_description="produit original",
             price_ht=1000,
             tax=10,
-            price_it=1100
+            price_it=1100,
+            product_type='achat/vente'
         )
         self.assertEqual(updated_product.tax, 10)
 
@@ -121,7 +129,8 @@ class ProductUpdateTests(TestCase):
             product_description="nouvelle description",
             price_ht=1000,
             tax=20,
-            price_it=1200
+            price_it=1200,
+            product_type='achat/vente'
         )
         self.assertEqual(updated_product.product_description, "nouvelle description")
 
@@ -134,7 +143,8 @@ class ProductDeleteTests(TestCase):
             product_description="produit à supprimer",
             price_ht=1000,
             tax=20,
-            price_it=1200
+            price_it=1200,
+            product_type='achat/vente'
         )
 
     def test_delete_product(self):
@@ -153,14 +163,16 @@ class ProductRetrievalTests(TestCase):
             product_description="produit 1",
             price_ht=1000,
             tax=20,
-            price_it=1200
+            price_it=1200,
+            product_type='achat/vente'
         )
         self.product2 = self.service.create_product(
             product_id=2,
             product_description="produit 2",
             price_ht=500,
             tax=5.5,
-            price_it=527.5
+            price_it=527.5,
+            product_type='achat/vente'
         )
 
     def test_get_product_by_id(self):
@@ -191,7 +203,8 @@ class ProductBoundaryTests(TestCase):
             product_description="produit gratuit",
             price_ht=0,
             tax=20,
-            price_it=0
+            price_it=0,
+            product_type='achat/vente'
         )
         self.assertEqual(product.price_ht, 0)
 
@@ -202,7 +215,8 @@ class ProductBoundaryTests(TestCase):
             product_description="sans taxe",
             price_ht=1000,
             tax=0,
-            price_it=1000
+            price_it=1000,
+            product_type='achat/vente'
         )
         self.assertEqual(product.tax, 0)
 
@@ -213,7 +227,8 @@ class ProductBoundaryTests(TestCase):
             product_description="produit cher",
             price_ht=999999.99,
             tax=20,
-            price_it=1199999.99
+            price_it=1199999.99,
+            product_type='achat/vente'
         )
         self.assertGreater(product.price_ht, 100000)
 
@@ -224,7 +239,8 @@ class ProductBoundaryTests(TestCase):
             product_description="taxe décimale",
             price_ht=1000,
             tax=5.5,
-            price_it=1055
+            price_it=1055,
+            product_type='achat/vente'
         )
         self.assertEqual(product.tax, Decimal('5.5'))
 
@@ -240,7 +256,8 @@ class ProductCalculationTests(TestCase):
             product_description="taxe 0%",
             price_ht=100,
             tax=0,
-            price_it=100
+            price_it=100,
+            product_type='achat/vente'
         )
         self.assertEqual(product.price_it, 100)
 
@@ -251,7 +268,8 @@ class ProductCalculationTests(TestCase):
             product_description="taxe 5.5%",
             price_ht=100,
             tax=5.5,
-            price_it=105.5
+            price_it=105.5,
+            product_type='achat/vente'
         )
         self.assertEqual(product.price_it, 105.5)
 
@@ -262,7 +280,8 @@ class ProductCalculationTests(TestCase):
             product_description="taxe 10%",
             price_ht=100,
             tax=10,
-            price_it=110
+            price_it=110,
+            product_type='achat/vente'
         )
         self.assertEqual(product.price_it, 110)
 
@@ -273,7 +292,8 @@ class ProductCalculationTests(TestCase):
             product_description="taxe 20%",
             price_ht=100,
             tax=20,
-            price_it=120
+            price_it=120,
+            product_type='achat/vente'
         )
         self.assertEqual(product.price_it, 120)
 
@@ -284,6 +304,7 @@ class ProductCalculationTests(TestCase):
             product_description="valeurs élevées",
             price_ht=1000,
             tax=20,
-            price_it=1200
+            price_it=1200,
+            product_type='achat/vente'
         )
         self.assertEqual(product.price_it, 1200)

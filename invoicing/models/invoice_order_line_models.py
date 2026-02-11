@@ -7,11 +7,11 @@ from invoicing.models.invoice_models import Invoice
 from products.models.product_models import Product
 
 
-class InvoiceOrderLineStatus(models.TextChoices):
-    MULTIPLE = "MULTIPLE", "Paiement en plusieurs fois"
-    PAID = "PAID", "Réglé"
-    WAITING = "WAITING", "En attente"
-    CANCELLED = 'CANCELLED', 'Annulée'
+
+STATUS_CHOICE =  (
+        ('En attente', 'En attente'),
+        ('réglé', 'réglé'),
+)
 
 
 class InvoiceOrderLine(models.Model):
@@ -24,4 +24,4 @@ class InvoiceOrderLine(models.Model):
     price_tax = models.FloatField()
     quantity = models.IntegerField()
     date = models.DateField()
-    status = models.CharField(max_length=20, choices=InvoiceOrderLineStatus.choices, default=InvoiceOrderLineStatus.WAITING )
+    status = models.CharField(max_length=20, choices=STATUS_CHOICE, default='En attente' )
