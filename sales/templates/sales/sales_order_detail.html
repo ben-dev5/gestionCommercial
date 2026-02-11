@@ -1,0 +1,98 @@
+{% extends "commons/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{% if sales_order.type == 'Devis' %}Devis{% else %}Commande{% endif %}</h1>
+            <p class="text-muted">{{ sales_order.contact_id.first_name }} {{ sales_order.contact_id.last_name }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'sales:sales_order_pdf' sales_order.pk %}" class="btn btn-primary" title="Télécharger en PDF">
+                <i class="bi bi-file-pdf"></i> PDF
+            </a>
+            <a href="{% url 'sales:sales_order_update' sales_order.pk %}" class="btn btn-warning">
+                <i class="bi bi-pencil"></i> Modifier
+            </a>
+            <a href="{% url 'sales:sales_order_delete' sales_order.pk %}" class="btn btn-danger">
+                <i class="bi bi-trash"></i> Supprimer
+            </a>
+            <a href="{% url 'sales:sales_order_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Informations</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Type:</strong> {{ sales_order.type }}</p>
+                    <p><strong>Genre:</strong> {{ sales_order.genre }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Contact:</strong> {{ sales_order.contact_id.first_name }} {{ sales_order.contact_id.last_name }}</p>
+                    <p><strong>Email:</strong> {{ sales_order.contact_id.email }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title mb-0">Lignes du devis/commande</h5>
+            <a href="{% url 'sales:sales_order_line_create' sales_order.pk %}" class="btn btn-secondary btn-sm">
+                <i class="bi bi-plus-circle"></i> Ajouter un produit
+            </a>
+        </div>
+        <div class="card-body">
+            {% if lines %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th>Genre</th>
+                            <th>Quantité</th>
+                            <th>Prix HT</th>
+                            <th>Taxe</th>
+                            <th>Total HT</th>
+                            <th>Total TTC</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for line in lines %}
+                            {% widthratio line.price_ht line.tax 100 as price_ttc_unitaire %}
+                            {% widthratio line.price_ht 1 line.quantity as total_ht %}
+                            {% widthratio price_ttc_unitaire 1 line.quantity as total_ttc %}
+                            <tr>
+                                <td>{{ line.product_id.product_description }}</td>
+                                <td>{{ line.genre }}</td>
+                                <td>{{ line.quantity }}</td>
+                                <td>{{ line.price_ht|floatformat:2 }}€</td>
+                                <td>{{ line.tax|floatformat:2 }}%</td>
+                                <td>{{ total_ht|floatformat:2 }}€</td>
+                                <td class="fw-bold text-success">{{ total_ttc|floatformat:2 }}€</td>
+                                <td>
+                                    <a href="{% url 'sales:sales_order_line_delete' sales_order.pk line.pk %}" class="btn btn-sm btn-outline-danger">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                Aucune ligne dans ce devis/commande.
+                <a href="{% url 'sales:sales_order_line_create' sales_order.pk %}">Ajouter un produit</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

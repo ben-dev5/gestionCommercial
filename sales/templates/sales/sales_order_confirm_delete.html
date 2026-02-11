@@ -1,0 +1,30 @@
+{% extends "commons/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-6 offset-md-3">
+            <div class="card border-danger">
+                <div class="card-body text-center">
+                    <h3 class="card-title text-danger mb-4">Confirmer la suppression</h3>
+                    <p class="card-text mb-4">
+                        Êtes-vous sûr de vouloir supprimer le devis/commande
+                        <strong>#{{ sales_order.sales_order_id }}</strong>
+                        de <strong>{{ sales_order.contact_id.first_name }} {{ sales_order.contact_id.last_name }}</strong> ?
+                    </p>
+                    <form method="post" class="d-inline-block">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Supprimer
+                        </button>
+                        <a href="{% url 'sales:sales_order_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-x-circle"></i> Annuler
+                        </a>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

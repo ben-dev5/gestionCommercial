@@ -1,0 +1,62 @@
+{% extends "commons/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>{% if order_type == 'Devis' %}Devis{% elif order_type == 'Commande' %}Commandes{% else %}Devis et Commandes{% endif %}</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'sales:sales_order_create' %}" class="btn btn-secondary">
+                <i class="bi bi-plus-circle"></i> Nouveau
+            </a>
+        </div>
+    </div>
+
+    {% if sales_orders %}
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Contact</th>
+                    <th>Type</th>
+                    <th>Genre</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for sales_order in sales_orders %}
+                <tr>
+                    <td>{{ sales_order.contact_id.first_name }} {{ sales_order.contact_id.last_name }}</td>
+                    <td>
+                        {% if sales_order.type == 'Devis' %}
+                            <span class="badge bg-info">Devis</span>
+                        {% elif sales_order.type == 'Commande' %}
+                            <span class="badge bg-success">Commande</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ sales_order.genre }}</td>
+                    <td>
+                        <a href="{% url 'sales:sales_order_detail' sales_order.pk %}" class="btn btn-sm btn-outline-info">
+                            <i class="bi bi-eye"></i>
+                        </a>
+                        <a href="{% url 'sales:sales_order_update' sales_order.pk %}" class="btn btn-sm btn-outline-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <a href="{% url 'sales:sales_order_delete' sales_order.pk %}" class="btn btn-sm btn-outline-danger">
+                            <i class="bi bi-trash"></i>
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        Aucun devis ou commande trouvé(e). <a href="{% url 'sales:sales_order_create' %}">Créer un devis</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+

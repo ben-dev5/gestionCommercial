@@ -1,0 +1,97 @@
+{% extends "commons/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1>Ajouter un produit au devis/commande</h1>
+
+            <form method="post" class="mt-4">
+                {% csrf_token %}
+
+                <div class="mb-3">
+                    <label for="{{ form.product_id.id_for_label }}" class="form-label">Produit</label>
+                    {{ form.product_id }}
+                    {% if form.product_id.errors %}
+                    <div class="alert alert-danger mt-1">{{ form.product_id.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.quantity.id_for_label }}" class="form-label">Quantité</label>
+                            {{ form.quantity }}
+                            {% if form.quantity.errors %}
+                            <div class="alert alert-danger mt-1">{{ form.quantity.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.price_ht.id_for_label }}" class="form-label">Prix HT</label>
+                            {{ form.price_ht }}
+                            {% if form.price_ht.errors %}
+                            <div class="alert alert-danger mt-1">{{ form.price_ht.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.tax.id_for_label }}" class="form-label">Taxe (%)</label>
+                            {{ form.tax }}
+                            {% if form.tax.errors %}
+                            <div class="alert alert-danger mt-1">{{ form.tax.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="{{ form.price_it.id_for_label }}" class="form-label">Prix TTC</label>
+                            {{ form.price_it }}
+                            {% if form.price_it.errors %}
+                            <div class="alert alert-danger mt-1">{{ form.price_it.errors }}</div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
+                    {{ form.date }}
+                    {% if form.date.errors %}
+                    <div class="alert alert-danger mt-1">{{ form.date.errors }}</div>
+                    {% endif %}
+                </div>
+
+                <div class="mb-3">
+                    <label for="{{ form.genre.id_for_label }}" class="form-label">Genre</label>
+                    {{ form.genre }}
+                    {% if form.genre.errors %}
+                    <div class="alert alert-danger mt-1">{{ form.genre.errors }}</div>
+                    {% endif %}
+                </div>
+
+                {% if form.non_field_errors %}
+                <div class="alert alert-danger">
+                    {{ form.non_field_errors }}
+                </div>
+                {% endif %}
+
+                <div class="mt-4">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> Ajouter
+                    </button>
+                    <a href="{% url 'sales:sales_order_detail' sales_order.pk %}" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i> Annuler
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
