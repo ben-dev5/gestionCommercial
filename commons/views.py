@@ -86,10 +86,24 @@ class ContactUpdateView(TemplateView):
         try:
             contact = service.get_contact_by_id(self.kwargs['pk'])
             context['object'] = contact
+
+            initial_data = {
+                'first_name': contact.first_name,
+                'last_name': contact.last_name,
+                'email': contact.email,
+                'phone': contact.phone,
+                'type': contact.type,
+                'siret': contact.siret,
+                'address': contact.address,
+                'city': contact.city,
+                'state': contact.state,
+                'zip_code': contact.zip_code,
+            }
+
             if self.request.POST:
-                context['form'] = ContactForm(self.request.POST, instance=contact)
+                context['form'] = ContactForm(self.request.POST)
             else:
-                context['form'] = ContactForm(instance=contact)
+                context['form'] = ContactForm(initial=initial_data)
         except:
             raise Http404("Contact non trouvé")
         return context
@@ -101,7 +115,7 @@ class ContactUpdateView(TemplateView):
         except:
             raise Http404("Contact non trouvé")
 
-        form = ContactForm(request.POST, instance=contact)
+        form = ContactForm(request.POST)
         if form.is_valid():
             updated_contact = service.update_contact(
                 contact_id=contact.contact_id,
