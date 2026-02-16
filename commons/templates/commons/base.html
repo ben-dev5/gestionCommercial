@@ -78,7 +78,7 @@
                     <a class="nav-link {% if request.resolver_match.name == 'products:product_list' %}active{% endif %}" href="{% url 'products:product_list' %}">
                         <i class="bi bi-box-seam"></i> Produits
                     </a>
-                    <a class="nav-link disabled" href="#" title="À venir">
+                    <a class="nav-link {% if request.resolver_match.name == 'invoicing:invoice_list' %}active{% endif %}" href="{% url 'invoicing:invoice_list' %}">
                         <i class="bi bi-receipt"></i> Factures
                     </a>
                 </div>

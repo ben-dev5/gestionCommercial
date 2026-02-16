@@ -40,8 +40,16 @@ class SalesOrderDetailView(TemplateView):
         line_service = SalesOrderLineService()
 
         try:
-            context['sales_order'] = service.get_sales_order_by_id(pk)
-            context['lines'] = line_service.get_sales_order_lines_by_order(pk)
+            sales_order = service.get_sales_order_by_id(pk)
+            lines = line_service.get_sales_order_lines_by_order(pk)
+
+            # Ajouter le total HT calculé pour chaque ligne
+            for line in lines:
+                line.total_ht = line.price_ht * line.quantity
+
+            context['sales_order'] = sales_order
+            context['lines'] = lines
+            context['has_lines'] = len(lines) > 0
         except:
             raise Http404("Devis/Commande non trouvé(e)")
 

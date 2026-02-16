@@ -24,3 +24,4 @@ class SalesOrderLine(models.Model):
 
     def __str__(self):
         return f"Ligne {self.sales_order_line_id} - {self.sales_order_id}"
+

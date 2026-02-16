@@ -8,20 +8,47 @@
             <p class="text-muted">{{ sales_order.contact_id.first_name }} {{ sales_order.contact_id.last_name }}</p>
         </div>
         <div class="col-md-4 text-end">
-            <a href="{% url 'sales:sales_order_pdf' sales_order.pk %}" class="btn btn-primary" title="Télécharger en PDF">
-                <i class="bi bi-file-pdf"></i> PDF
-            </a>
-            <a href="{% url 'sales:sales_order_update' sales_order.pk %}" class="btn btn-warning">
-                <i class="bi bi-pencil"></i> Modifier
-            </a>
-            <a href="{% url 'sales:sales_order_delete' sales_order.pk %}" class="btn btn-danger">
-                <i class="bi bi-trash"></i> Supprimer
-            </a>
+            {% if has_lines %}
+                <a href="{% url 'sales:sales_order_pdf' sales_order.pk %}" class="btn btn-primary" title="Télécharger en PDF">
+                    <i class="bi bi-file-pdf"></i> PDF
+                </a>
+                <form method="post" action="{% url 'invoicing:create_from_sales' sales_order.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-success" title="Créer une facture à partir de ce devis/commande">
+                        <i class="bi bi-receipt"></i> Créer facture
+                    </button>
+                </form>
+                <a href="{% url 'sales:sales_order_update' sales_order.pk %}" class="btn btn-warning">
+                    <i class="bi bi-pencil"></i> Modifier
+                </a>
+                <a href="{% url 'sales:sales_order_delete' sales_order.pk %}" class="btn btn-danger">
+                    <i class="bi bi-trash"></i> Supprimer
+                </a>
+            {% else %}
+                <button class="btn btn-primary" disabled title="Ajoutez d'abord un produit">
+                    <i class="bi bi-file-pdf"></i> PDF
+                </button>
+                <button class="btn btn-warning" disabled title="Ajoutez d'abord un produit">
+                    <i class="bi bi-pencil"></i> Modifier
+                </button>
+                <button class="btn btn-danger" disabled title="Ajoutez d'abord un produit">
+                    <i class="bi bi-trash"></i> Supprimer
+                </button>
+            {% endif %}
             <a href="{% url 'sales:sales_order_list' %}" class="btn btn-secondary">
                 <i class="bi bi-arrow-left"></i> Retour
             </a>
         </div>
     </div>
+
+    {% if not has_lines %}
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle"></i> <strong>Attention !</strong> Vous devez ajouter au moins un produit à ce devis/commande avant de pouvoir le visualiser, le modifier ou le supprimer.
+        <a href="{% url 'sales:sales_order_line_create' sales_order.pk %}" class="btn btn-sm btn-warning ms-2">
+            <i class="bi bi-plus-circle"></i> Ajouter le premier produit
+        </a>
+    </div>
+    {% endif %}
 
     <div class="card mb-4">
         <div class="card-body">
@@ -64,17 +91,14 @@
                     </thead>
                     <tbody>
                         {% for line in lines %}
-                            {% widthratio line.price_ht line.tax 100 as price_ttc_unitaire %}
-                            {% widthratio line.price_ht 1 line.quantity as total_ht %}
-                            {% widthratio price_ttc_unitaire 1 line.quantity as total_ttc %}
                             <tr>
                                 <td>{{ line.product_id.product_description }}</td>
                                 <td>{{ line.genre }}</td>
                                 <td>{{ line.quantity }}</td>
                                 <td>{{ line.price_ht|floatformat:2 }}€</td>
                                 <td>{{ line.tax|floatformat:2 }}%</td>
-                                <td>{{ total_ht|floatformat:2 }}€</td>
-                                <td class="fw-bold text-success">{{ total_ttc|floatformat:2 }}€</td>
+                                <td>{{ line.total_ht|floatformat:2 }}€</td>
+                                <td class="fw-bold text-success">{{ line.price_it|floatformat:2 }}€</td>
                                 <td>
                                     <a href="{% url 'sales:sales_order_line_delete' sales_order.pk line.pk %}" class="btn btn-sm btn-outline-danger">
                                         <i class="bi bi-trash"></i>

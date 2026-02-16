@@ -1,0 +1,57 @@
+{% extends "commons/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Factures</h1>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="{% url 'commons:contact_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Liste des factures</h5>
+        </div>
+        <div class="card-body">
+            {% if invoices %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Numéro</th>
+                            <th>Contact</th>
+                            <th>Email</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for invoice in invoices %}
+                            <tr>
+                                <td>#{{ invoice.invoice_id }}</td>
+                                <td>{{ invoice.contact_id.first_name }} {{ invoice.contact_id.last_name }}</td>
+                                <td>{{ invoice.email }}</td>
+                                <td>
+                                    <a href="{% url 'invoicing:invoice_detail' invoice.invoice_id %}" class="btn btn-sm btn-outline-primary">
+                                        <i class="bi bi-eye"></i> Voir
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                Aucune facture pour le moment.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

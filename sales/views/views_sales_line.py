@@ -7,7 +7,6 @@ from django.contrib import messages
 from sales.services.sales_order_service import SalesOrderService
 from sales.services.sales_order_line_service import SalesOrderLineService
 from sales.sales_order_pdf import SalesOrderPDFService
-from commons.services.contact_service import ContactService
 from products.services.product_service import ProductService
 from sales.forms import SalesOrderForm, SalesOrderLineForm
 
@@ -66,11 +65,12 @@ class SalesOrderLineCreateView(TemplateView):
                         sales_order_id=sales_order_pk,
                         product_id=product_id,
                         contact_id=sales_order.contact_id.contact_id,
-                        price_ht=form.cleaned_data['price_ht'],
-                        tax=form.cleaned_data['tax'],
+                        price_ht=product.price_ht,
+                        tax=product.tax,
+                        price_it=form.cleaned_data['price_it'],
                         quantity=form.cleaned_data['quantity'],
                         date=form.cleaned_data['date'],
-                        genre=form.cleaned_data['genre'] or 'Produit'
+                        genre=form.cleaned_data['genre'] or product.product_description
                     )
                     messages.success(request, "Ligne ajoutée avec succès !")
                     return redirect('sales:sales_order_detail', pk=sales_order_pk)

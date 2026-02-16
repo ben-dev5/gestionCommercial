@@ -1,0 +1,76 @@
+{% extends "commons/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1>Facture #{{ invoice.invoice_id }}</h1>
+            <p class="text-muted">{{ invoice.contact_id.first_name }} {{ invoice.contact_id.last_name }}</p>
+        </div>
+        <div class="col-md-4 text-end">
+            {% if has_lines %}
+                <a href="{% url 'invoicing:invoice_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour
+                </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Informations</h5>
+            <div class="row">
+                <div class="col-md-6">
+                    <p><strong>Nom:</strong> {{ invoice.name }}</p>
+                    <p><strong>Email:</strong> {{ invoice.email }}</p>
+                </div>
+                <div class="col-md-6">
+                    <p><strong>Adresse:</strong> {{ invoice.address }}</p>
+                    <p><strong>Ville:</strong> {{ invoice.city }} {{ invoice.zip_code }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h5 class="card-title mb-0">Lignes de la facture</h5>
+        </div>
+        <div class="card-body">
+            {% if lines %}
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Produit</th>
+                            <th>Quantité</th>
+                            <th>Prix HT</th>
+                            <th>Taxe</th>
+                            <th>Total HT</th>
+                            <th>Total TTC</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for line in lines %}
+                            <tr>
+                                <td>{{ line.product_id.product_description }}</td>
+                                <td>{{ line.quantity }}</td>
+                                <td>{{ line.price_ht|floatformat:2 }}€</td>
+                                <td>{{ line.tax|floatformat:2 }}%</td>
+                                <td>{{ line.total_ht|floatformat:2 }}€</td>
+                                <td class="fw-bold text-success">{{ line.price_tax|floatformat:2 }}€</td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <div class="alert alert-info">
+                Aucune ligne dans cette facture.
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+

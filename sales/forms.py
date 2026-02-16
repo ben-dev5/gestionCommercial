@@ -1,6 +1,6 @@
 from django import forms
-from decimal import Decimal
 from django.core.exceptions import ValidationError
+from products.services.product_service import ProductService
 
 
 class SalesOrderForm(forms.Form):
@@ -55,24 +55,6 @@ class SalesOrderLineForm(forms.Form):
             'placeholder': '1'
         })
     )
-    price_ht = forms.DecimalField(
-        label='Prix HT',
-        max_digits=10,
-        decimal_places=2,
-        widget=forms.NumberInput(attrs={
-            'class': 'form-control',
-            'step': '0.01'
-        })
-    )
-    tax = forms.DecimalField(
-        label='Taxe (%)',
-        max_digits=5,
-        decimal_places=2,
-        widget=forms.NumberInput(attrs={
-            'class': 'form-control',
-            'step': '0.01'
-        })
-    )
     price_it = forms.DecimalField(
         label='Prix TTC',
         max_digits=10,
@@ -80,7 +62,7 @@ class SalesOrderLineForm(forms.Form):
         widget=forms.NumberInput(attrs={
             'class': 'form-control',
             'step': '0.01',
-            'readonly': 'readonly'
+            #'readonly': 'readonly'
         }),
         required=False
     )
@@ -115,14 +97,31 @@ class SalesOrderLineForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
-        price_ht = cleaned_data.get('price_ht')
-        tax = cleaned_data.get('tax')
+        product_id = cleaned_data.get('product_id')
+        quantity = cleaned_data.get('quantity')
 
-        if price_ht is not None and tax is not None:
-            price_it_calculated = price_ht * (Decimal(1) + tax / Decimal(100))
-            cleaned_data['price_it'] = price_it_calculated.quantize(Decimal('0.01'))
+        if product_id:
+            try:
+                product_service = ProductService()
+                product = product_service.get_product_by_id(product_id)
+
+                if product and quantity:
+                    price_ht = product.price_ht
+                    tax = product.tax
+                    # Calcul du prix TTC unitaire, puis multiplication par la quantité
+                    price_ht_total = price_ht * quantity
+                    price_it_calculated = price_ht_total * (1 + tax / 100)
+                    cleaned_data['price_it'] = price_it_calculated
+                elif not quantity:
+                    raise ValidationError("Veuillez entrer une quantité.")
+                else:
+                    raise ValidationError("Produit introuvable.")
+            except ValidationError:
+                raise
+            except Exception as e:
+                raise ValidationError(f"Erreur lors de la récupération du produit : {str(e)}")
         else:
-            raise ValidationError("Le prix HT et la taxe sont requis pour calculer le prix TTC.")
+            raise ValidationError("Veuillez sélectionner un produit.")
 
         return cleaned_data
 

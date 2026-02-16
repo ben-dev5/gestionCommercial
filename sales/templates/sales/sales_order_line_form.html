@@ -27,37 +27,10 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="{{ form.price_ht.id_for_label }}" class="form-label">Prix HT</label>
-                            {{ form.price_ht }}
-                            {% if form.price_ht.errors %}
-                            <div class="alert alert-danger mt-1">{{ form.price_ht.errors }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
+
                 </div>
 
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="{{ form.tax.id_for_label }}" class="form-label">Taxe (%)</label>
-                            {{ form.tax }}
-                            {% if form.tax.errors %}
-                            <div class="alert alert-danger mt-1">{{ form.tax.errors }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="mb-3">
-                            <label for="{{ form.price_it.id_for_label }}" class="form-label">Prix TTC</label>
-                            {{ form.price_it }}
-                            {% if form.price_it.errors %}
-                            <div class="alert alert-danger mt-1">{{ form.price_it.errors }}</div>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
+
 
                 <div class="mb-3">
                     <label for="{{ form.date.id_for_label }}" class="form-label">Date</label>
