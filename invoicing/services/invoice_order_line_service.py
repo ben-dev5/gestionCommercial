@@ -43,7 +43,7 @@ class InvoiceOrderLineService:
         if quantity <= 0:
             raise ValueError("La quantité doit être positive")
 
-    def create_invoice_order_line(self, invoice_id, product_id, contact_id, price_ht, tax, price_tax, quantity, date, status='En attente'):
+    def create_invoice_order_line(self, invoice_id, product_id, contact_id, price_ht, tax, price_tax, quantity, date):
         """Créer une nouvelle ligne de facture"""
         self.validate_invoice_order_line_data(invoice_id, product_id, contact_id, price_ht, tax, quantity, date)
 
@@ -52,7 +52,7 @@ class InvoiceOrderLineService:
         product = self.product_service.get_product_by_id(product_id)
         contact = self.contact_service.get_contact_by_id(contact_id)
 
-        return self.repo.create_invoice_order_line(invoice, product, contact, price_ht, tax, price_tax, quantity, date, status)
+        return self.repo.create_invoice_order_line(invoice, product, contact, price_ht, tax, price_tax, quantity, date)
 
     def delete_invoice_order_line(self, line_id):
         """Supprimer une ligne de facture"""
@@ -70,14 +70,14 @@ class InvoiceOrderLineService:
         """Récupérer les lignes de facture d'une facture"""
         return self.repo.get_invoice_order_lines_by_invoice(invoice_id)
 
-    def update_invoice_order_line(self, line_id, invoice_id, product_id, contact_id, price_ht, tax, price_tax, quantity, date, status):
+    def update_invoice_order_line(self, line_id, invoice_id, product_id, contact_id, price_ht, tax, price_tax, quantity, date):
         """Mettre à jour une ligne de facture"""
         self.validate_invoice_order_line_data(invoice_id, product_id, contact_id, price_ht, tax, quantity, date)
 
-        # Récupérer les objets
+
         invoice = self.invoice_service.get_invoice_by_id(invoice_id)
         product = self.product_service.get_product_by_id(product_id)
         contact = self.contact_service.get_contact_by_id(contact_id)
 
-        return self.repo.update_invoice_order_line(line_id, invoice, product, contact, price_ht, tax, price_tax, quantity, date, status)
+        return self.repo.update_invoice_order_line(line_id, invoice, product, contact, price_ht, tax, price_tax, quantity, date)
 

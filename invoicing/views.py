@@ -2,11 +2,15 @@ from django.shortcuts import redirect
 from django.views.generic import TemplateView
 from django.http import Http404
 from django.contrib import messages
+from datetime import datetime
 
 from invoicing.services.invoice_service import InvoiceService
 from invoicing.services.invoice_order_line_service import InvoiceOrderLineService
+from invoicing.forms import InvoiceStatusForm
 from sales.services.sales_order_service import SalesOrderService
 from sales.services.sales_order_line_service import SalesOrderLineService
+from django.http import FileResponse
+from sales.sales_order_pdf import SalesOrderPDFService
 
 
 class InvoiceListView(TemplateView):
@@ -46,10 +50,43 @@ class InvoiceDetailView(TemplateView):
             context['invoice'] = invoice
             context['lines'] = lines
             context['has_lines'] = len(lines) > 0
+            context['status_form'] = InvoiceStatusForm(initial={'status': invoice.status})
         except:
             raise Http404("Facture non trouvée")
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        invoice_service = InvoiceService()
+
+        try:
+            invoice = invoice_service.get_invoice_by_id(pk)
+            form = InvoiceStatusForm(request.POST)
+
+            if form.is_valid():
+                new_status = form.cleaned_data['status']
+                invoice_service.update_invoice(
+                    invoice_id=pk,
+                    contact_id=invoice.contact_id.contact_id,
+                    name=invoice.name,
+                    address=invoice.address,
+                    city=invoice.city,
+                    state=invoice.state,
+                    zip_code=invoice.zip_code,
+                    siret=invoice.siret,
+                    email=invoice.email,
+                    phone=invoice.phone,
+                    status=new_status
+                )
+                messages.success(request, f"Statut mis à jour : {new_status}")
+            else:
+                messages.error(request, "Erreur lors de la mise à jour du statut")
+
+        except Exception as e:
+            messages.error(request, f"Erreur : {str(e)}")
+
+        return redirect('invoicing:invoice_detail', pk=pk)
 
 
 class CreateInvoiceFromSalesOrderView(TemplateView):
@@ -96,8 +133,7 @@ class CreateInvoiceFromSalesOrderView(TemplateView):
                     tax=sales_line.tax,
                     price_tax=sales_line.price_it,
                     quantity=sales_line.quantity,
-                    date=sales_line.date,
-                    status='En attente'
+                    date=sales_line.date
                 )
 
             messages.success(request, f"Facture créée avec succès ! Numéro : {invoice.invoice_id}")
@@ -109,3 +145,81 @@ class CreateInvoiceFromSalesOrderView(TemplateView):
         except Exception as e:
             messages.error(request, f"Une erreur est survenue : {str(e)}")
             return redirect('sales:sales_order_detail', pk=sales_order_pk)
+
+class InvoicePdfView(TemplateView):
+    """Vue pour générer le PDF d'une facture"""
+
+    def get(self, request, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        invoice_service = InvoiceService()
+        invoice_line_service = InvoiceOrderLineService()
+        pdf_service = SalesOrderPDFService()
+
+        try:
+            invoice = invoice_service.get_invoice_by_id(pk)
+            lines = invoice_line_service.get_invoice_order_lines_by_invoice(pk)
+
+            # Créer un objet facture compatible avec le service PDF
+            class InvoicePdfAdapter:
+                def __init__(self, invoice):
+                    self.contact_id = invoice.contact_id
+                    self.type = "Facture"
+                    self.genre = "Facture"
+                    self.created_at = datetime.now()
+                    self.invoice_id = invoice.invoice_id
+
+            # Créer des adaptateurs pour les lignes
+            class InvoiceLinePdfAdapter:
+                def __init__(self, line):
+                    self.product_id = line.product_id
+                    self.genre = line.product_id.product_description  # Utiliser la description du produit comme genre
+                    self.quantity = line.quantity
+                    self.price_ht = line.price_ht
+                    self.tax = line.tax
+                    self.price_it = line.price_tax  # Mapper price_tax vers price_it
+
+            invoice_adapter = InvoicePdfAdapter(invoice)
+            adapted_lines = [InvoiceLinePdfAdapter(line) for line in lines]
+
+            pdf_buffer = pdf_service.generate_pdf(invoice_adapter, adapted_lines)
+
+            return FileResponse(
+                pdf_buffer,
+                as_attachment=True,
+                filename=f"facture_{pk}.pdf"
+            )
+        except Exception as e:
+            messages.error(request, f"Erreur : {str(e)}")
+            return redirect('invoicing:invoice_detail', pk=pk)
+
+
+class InvoiceDeleteView(TemplateView):
+    """Vue pour confirmer et supprimer une facture"""
+    template_name = 'invoicing/invoice_confirm_delete.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        pk = self.kwargs.get('pk')
+        invoice_service = InvoiceService()
+
+        try:
+            invoice = invoice_service.get_invoice_by_id(pk)
+            context['invoice'] = invoice
+        except:
+            raise Http404("Facture non trouvée")
+
+        return context
+
+    def post(self, request, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        invoice_service = InvoiceService()
+
+        try:
+            invoice = invoice_service.get_invoice_by_id(pk)
+            invoice_id = invoice.invoice_id
+            invoice_service.delete_invoice(invoice_id)
+            messages.success(request, f"Facture #{invoice_id} supprimée avec succès !")
+            return redirect('invoicing:invoice_list')
+        except Exception as e:
+            messages.error(request, f"Erreur lors de la suppression : {str(e)}")
+            return redirect('invoicing:invoice_list')

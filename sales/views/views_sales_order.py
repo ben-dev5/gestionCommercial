@@ -152,6 +152,8 @@ class SalesOrderUpdateView(TemplateView):
             except ValueError as e:
                 form.add_error(None, str(e))
 
+        context = self.get_context_data(**kwargs)
+        context['form'] = form
         return self.render_to_response(context)
 
 
@@ -176,5 +178,3 @@ class SalesOrderDeleteView(TemplateView):
         service.delete_sales_order(pk)
         messages.success(request, "Devis/Commande supprimé(e) avec succès !")
         return redirect('sales:sales_order_list')
-
-

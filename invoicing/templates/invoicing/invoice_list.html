@@ -26,6 +26,7 @@
                             <th>Numéro</th>
                             <th>Contact</th>
                             <th>Email</th>
+                            <th>Statut</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -36,9 +37,21 @@
                                 <td>{{ invoice.contact_id.first_name }} {{ invoice.contact_id.last_name }}</td>
                                 <td>{{ invoice.email }}</td>
                                 <td>
-                                    <a href="{% url 'invoicing:invoice_detail' invoice.invoice_id %}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye"></i> Voir
-                                    </a>
+                                    {% if invoice.status == 'réglé' %}
+                                        <span class="badge bg-success">Réglé</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">En attente</span>
+                                    {% endif %}
+                                </td>
+                                <td>
+                                    <div class="btn-group" role="group">
+                                        <a href="{% url 'invoicing:invoice_detail' invoice.invoice_id %}" class="btn btn-sm btn-outline-primary">
+                                            <i class="bi bi-eye"></i> Voir
+                                        </a>
+                                        <a href="{% url 'invoicing:invoice_delete' invoice.invoice_id %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i> Supprimer
+                                        </a>
+                                    </div>
                                 </td>
                             </tr>
                         {% endfor %}

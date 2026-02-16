@@ -5,6 +5,8 @@ from django.http import Http404
 
 from commons.services.contact_service import ContactService
 from commons.forms import ContactForm
+from sales.services.sales_order_service import SalesOrderService
+from invoicing.services.invoice_service import InvoiceService
 
 
 class ContactListView(TemplateView):
@@ -154,6 +156,37 @@ class ContactDeleteView(TemplateView):
             contact = service.get_contact_by_id(self.kwargs['pk'])
         except:
             raise Http404("Contact non trouvé")
+
+        # Vérifier les documents associés via les services
+        sales_order_service = SalesOrderService()
+        invoice_service = InvoiceService()
+
+        # Récupérer tous les documents et filtrer par contact
+        all_sales_orders = sales_order_service.get_all_sales_orders()
+        all_invoices = invoice_service.get_all_invoices()
+
+        sales_orders_contact = [so for so in all_sales_orders if so.contact_id.contact_id == contact.contact_id]
+        invoices_contact = [inv for inv in all_invoices if inv.contact_id.contact_id == contact.contact_id]
+
+        # Compter les documents
+        sales_orders_count = len(sales_orders_contact)
+        invoices_count = len(invoices_contact)
+
+        # Si des documents existent, empêcher la suppression
+        if sales_orders_count > 0 or invoices_count > 0:
+            error_messages = []
+            if sales_orders_count > 0:
+                error_messages.append(f"{sales_orders_count} devis/commande(s)")
+            if invoices_count > 0:
+                error_messages.append(f"{invoices_count} facture(s)")
+
+            documents = " et ".join(error_messages)
+            messages.error(
+                request,
+                f"Impossible de supprimer ce contact. Il est associé à {documents}. "
+                f"Veuillez d'abord supprimer les documents associés."
+            )
+            return redirect('commons:contact_detail', pk=contact.contact_id)
 
         first_name = contact.first_name
         last_name = contact.last_name

@@ -8,7 +8,19 @@
             <p class="text-muted">{{ invoice.contact_id.first_name }} {{ invoice.contact_id.last_name }}</p>
         </div>
         <div class="col-md-4 text-end">
+            {% if invoice.status == 'réglé' %}
+                <span class="badge bg-success" style="font-size: 1rem;">Réglé</span>
+            {% else %}
+                <span class="badge bg-warning" style="font-size: 1rem;">En attente</span>
+            {% endif %}
+            <br><br>
             {% if has_lines %}
+                <a href="{% url 'invoicing:invoice_pdf' invoice.invoice_id %}" class="btn btn-outline-primary" target="_blank">
+                    <i class="bi bi-file-pdf"></i> Télécharger PDF
+                </a>
+                <a href="{% url 'invoicing:invoice_delete' invoice.invoice_id %}" class="btn btn-outline-danger">
+                    <i class="bi bi-trash"></i> Supprimer
+                </a>
                 <a href="{% url 'invoicing:invoice_list' %}" class="btn btn-secondary">
                     <i class="bi bi-arrow-left"></i> Retour
                 </a>
@@ -29,6 +41,23 @@
                     <p><strong>Ville:</strong> {{ invoice.city }} {{ invoice.zip_code }}</p>
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">Statut de la facture</h5>
+            <form method="post" class="row g-3">
+                {% csrf_token %}
+                <div class="col-md-6">
+                    {{ status_form.status }}
+                </div>
+                <div class="col-md-6">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Mettre à jour
+                    </button>
+                </div>
+            </form>
         </div>
     </div>
 

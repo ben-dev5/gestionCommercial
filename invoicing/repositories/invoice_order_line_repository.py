@@ -5,7 +5,7 @@ class InvoiceOrderLineRepository:
     def __init__(self):
         pass
 
-    def create_invoice_order_line(self, invoice, product, contact, price_ht, tax, price_tax, quantity, date, status='En attente'):
+    def create_invoice_order_line(self, invoice, product, contact, price_ht, tax, price_tax, quantity, date):
         """Créer une nouvelle ligne de facture"""
         line = InvoiceOrderLine.objects.create(
             invoice_id=invoice,
@@ -15,8 +15,7 @@ class InvoiceOrderLineRepository:
             tax=tax,
             price_tax=price_tax,
             quantity=quantity,
-            date=date,
-            status=status
+            date=date
         )
         return line
 
@@ -35,7 +34,7 @@ class InvoiceOrderLineRepository:
         """Récupérer les lignes de facture d'une facture"""
         return InvoiceOrderLine.objects.filter(invoice_id=invoice_id)
 
-    def update_invoice_order_line(self, line_id, invoice, product, contact, price_ht, tax, price_tax, quantity, date, status):
+    def update_invoice_order_line(self, line_id, invoice, product, contact, price_ht, tax, price_tax, quantity, date):
         """Mettre à jour une ligne de facture"""
         line = self.get_invoice_order_line_by_id(line_id)
         line.invoice_id = invoice
@@ -46,7 +45,6 @@ class InvoiceOrderLineRepository:
         line.price_tax = price_tax
         line.quantity = quantity
         line.date = date
-        line.status = status
         line.save()
         return line
 

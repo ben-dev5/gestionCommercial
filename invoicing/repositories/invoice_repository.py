@@ -1,12 +1,11 @@
 from invoicing.models.invoice_models import Invoice
-from invoicing.models.invoice_order_line_models import InvoiceOrderLine
 
 
 class InvoiceRepository:
     def __init__(self):
         pass
 
-    def create_invoice(self, contact, name, address, city, state, zip_code, siret, email, phone):
+    def create_invoice(self, contact, name, address, city, state, zip_code, siret, email, phone, status='En attente'):
         """Créer une nouvelle facture"""
         invoice = Invoice.objects.create(
             contact_id=contact,
@@ -21,7 +20,8 @@ class InvoiceRepository:
             id_product=0,
             description_products='',
             price_ht=0,
-            tax=0
+            tax=0,
+            status=status
         )
         return invoice
 
@@ -40,7 +40,7 @@ class InvoiceRepository:
         """Récupérer les factures d'un contact"""
         return Invoice.objects.filter(contact_id=contact_id)
 
-    def update_invoice(self, invoice_id, contact, name, address, city, state, zip_code, siret, email, phone):
+    def update_invoice(self, invoice_id, contact, name, address, city, state, zip_code, siret, email, phone, status):
         """Mettre à jour une facture"""
         invoice = self.get_invoice_by_id(invoice_id)
         invoice.contact_id = contact
@@ -52,6 +52,7 @@ class InvoiceRepository:
         invoice.siret = siret
         invoice.email = email
         invoice.phone = phone
+        invoice.status = status
         invoice.save()
         return invoice
 

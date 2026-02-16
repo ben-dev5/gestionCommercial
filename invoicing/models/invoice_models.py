@@ -3,6 +3,12 @@ from django.db import models
 from commons.models.contact_models import Contact
 
 
+STATUS_CHOICES = (
+    ('En attente', 'En attente'),
+    ('réglé', 'Réglé'),
+)
+
+
 class Invoice(models.Model):
     invoice_id = models.AutoField(primary_key=True)
     contact_id = models.ForeignKey(Contact, on_delete=models.CASCADE)
@@ -18,4 +24,5 @@ class Invoice(models.Model):
     description_products = models.TextField()
     price_ht = models.IntegerField()
     tax = models.IntegerField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='En attente')
 

@@ -8,10 +8,7 @@ from products.models.product_models import Product
 
 
 
-STATUS_CHOICE =  (
-        ('En attente', 'En attente'),
-        ('réglé', 'réglé'),
-)
+
 
 
 class InvoiceOrderLine(models.Model):
@@ -24,4 +21,3 @@ class InvoiceOrderLine(models.Model):
     price_tax = models.FloatField()
     quantity = models.IntegerField()
     date = models.DateField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICE, default='En attente' )
