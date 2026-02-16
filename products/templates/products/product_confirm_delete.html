@@ -4,26 +4,58 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-6 offset-md-3">
-            <div class="card border-danger">
-                <div class="card-header bg-danger text-white">
-                    <h5 class="mb-0">Confirmation de suppression</h5>
+            <div class="card {% if is_used %}border-warning{% else %}border-danger{% endif %}">
+                <div class="card-header {% if is_used %}bg-warning{% else %}bg-danger{% endif %} text-white">
+                    <h5 class="mb-0">
+                        {% if is_used %}
+                            <i class="bi bi-exclamation-triangle"></i> Produit en utilisation
+                        {% else %}
+                            <i class="bi bi-exclamation-triangle"></i> Confirmation de suppression
+                        {% endif %}
+                    </h5>
                 </div>
                 <div class="card-body">
-                    <p class="mb-3">Êtes-vous sûr de vouloir supprimer ce produit ?</p>
-                    <div class="alert alert-info">
-                        <strong>{{ product.product_description }}</strong><br>
-                        ID: {{ product.product_id }}
-                    </div>
-
-                    <form method="post">
-                        {% csrf_token %}
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-trash"></i> Supprimer définitivement
-                        </button>
-                        <a href="{% url 'products:product_list' %}" class="btn btn-secondary">
-                            <i class="bi bi-arrow-left"></i> Annuler
+                    {% if is_used %}
+                        <div class="alert alert-danger">
+                            <strong><i class="bi bi-exclamation-circle"></i> Ce produit ne peut pas être supprimé</strong>
+                            <p class="mb-0 mt-2">Il est actuellement utilisé dans :</p>
+                            <ul class="mb-0 mt-2">
+                                {% if sales_lines_count > 0 %}
+                                    <li>{{ sales_lines_count }} ligne(s) de devis/commande</li>
+                                {% endif %}
+                                {% if invoice_lines_count > 0 %}
+                                    <li>{{ invoice_lines_count }} ligne(s) de facture</li>
+                                {% endif %}
+                            </ul>
+                        </div>
+                        <p class="text-muted mb-3">Veuillez d'abord supprimer les lignes associées pour pouvoir supprimer ce produit.</p>
+                        <a href="{% url 'products:product_detail' product.product_id %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour
                         </a>
-                    </form>
+                    {% else %}
+                        <p class="mb-3">Êtes-vous sûr de vouloir supprimer ce produit ?</p>
+                        <div class="alert alert-info">
+                            <strong>{{ product.product_description }}</strong><br>
+                            <small class="text-muted">Prix HT: {{ product.price_ht }}€ | Taxe: {{ product.tax }}%</small>
+                        </div>
+
+                        <p class="text-danger">
+                            <i class="bi bi-exclamation-circle"></i>
+                            Cette action est irréversible. Le produit sera définitivement supprimé.
+                        </p>
+
+                        <div class="d-flex justify-content-between">
+                            <a href="{% url 'products:product_detail' product.product_id %}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Annuler
+                            </a>
+                            <form method="post" style="display: inline;">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-trash"></i> Supprimer définitivement
+                                </button>
+                            </form>
+                        </div>
+                    {% endif %}
                 </div>
             </div>
         </div>

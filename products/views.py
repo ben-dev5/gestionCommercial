@@ -1,9 +1,11 @@
 from django.shortcuts import redirect
 from django.views.generic import TemplateView
+from django.contrib import messages
 
 from products.services.product_service import ProductService
-from django import forms
 from products.forms import ProductForm
+from sales.services.sales_order_line_service import SalesOrderLineService
+from invoicing.services.invoice_order_line_service import InvoiceOrderLineService
 
 class ProductListView(TemplateView):
     template_name = 'products/product_list.html'
@@ -110,11 +112,56 @@ class ProductDeleteView(TemplateView):
         context = super().get_context_data(**kwargs)
         pk = self.kwargs.get('pk')
         service = ProductService()
-        context['product'] = service.get_product_by_id(pk)
+        sales_line_service = SalesOrderLineService()
+        invoice_line_service = InvoiceOrderLineService()
+
+        product = service.get_product_by_id(pk)
+
+        # Vérifier l'utilisation du produit
+        all_sales_lines = sales_line_service.get_all_sales_order_lines()
+        all_invoice_lines = invoice_line_service.get_all_invoice_order_lines()
+
+        sales_lines_count = len([line for line in all_sales_lines if line.product_id.product_id == pk])
+        invoice_lines_count = len([line for line in all_invoice_lines if line.product_id.product_id == pk])
+
+        context['product'] = product
+        context['is_used'] = sales_lines_count > 0 or invoice_lines_count > 0
+        context['sales_lines_count'] = sales_lines_count
+        context['invoice_lines_count'] = invoice_lines_count
+
         return context
 
     def post(self, request, *args, **kwargs):
         pk = self.kwargs.get('pk')
         service = ProductService()
+        sales_line_service = SalesOrderLineService()
+        invoice_line_service = InvoiceOrderLineService()
+
+        product = service.get_product_by_id(pk)
+
+        # Vérifier l'utilisation du produit
+        all_sales_lines = sales_line_service.get_all_sales_order_lines()
+        all_invoice_lines = invoice_line_service.get_all_invoice_order_lines()
+
+        sales_lines_count = len([line for line in all_sales_lines if line.product_id.product_id == pk])
+        invoice_lines_count = len([line for line in all_invoice_lines if line.product_id.product_id == pk])
+
+        # Si le produit est utilisé, empêcher la suppression
+        if sales_lines_count > 0 or invoice_lines_count > 0:
+            error_messages = []
+            if sales_lines_count > 0:
+                error_messages.append(f"{sales_lines_count} ligne(s) de devis/commande")
+            if invoice_lines_count > 0:
+                error_messages.append(f"{invoice_lines_count} ligne(s) de facture")
+
+            documents = " et ".join(error_messages)
+            messages.error(
+                request,
+                f"Impossible de supprimer ce produit. Il est utilisé dans {documents}. "
+                f"Veuillez d'abord supprimer les lignes associées."
+            )
+            return redirect('products:product_detail', pk=pk)
+
         service.delete_product(pk)
+        messages.success(request, f"Produit '{product.product_description}' supprimé avec succès !")
         return redirect('products:product_list')

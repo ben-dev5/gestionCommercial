@@ -72,7 +72,7 @@
                     </a>
                     <h6 class="px-20 py-2 text-muted text-uppercase" style="padding-left: 20px; font-size: 0.75rem; font-weight: bold;">Autres</h6>
 
-                    <a class="nav-link disabled" href="#" title="À venir">
+                    <a class="nav-link {% if request.resolver_match.name == 'dashboard:dashboard' %}active{% endif %}" href="{% url 'dashboard:dashboard' %}">
                         <i class="bi bi-graph-up"></i> Tableau de bord
                     </a>
                     <a class="nav-link {% if request.resolver_match.name == 'products:product_list' %}active{% endif %}" href="{% url 'products:product_list' %}">

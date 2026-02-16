@@ -53,3 +53,4 @@ class SalesOrderService:
         contact = self.contact_service.get_contact_by_id(contact_id)
         return self.repo.update_sales_order(sales_order_id, contact, genre, order_type)
 
+

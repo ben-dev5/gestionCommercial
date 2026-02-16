@@ -147,7 +147,6 @@ class CreateInvoiceFromSalesOrderView(TemplateView):
             return redirect('sales:sales_order_detail', pk=sales_order_pk)
 
 class InvoicePdfView(TemplateView):
-    """Vue pour générer le PDF d'une facture"""
 
     def get(self, request, *args, **kwargs):
         pk = self.kwargs.get('pk')
