@@ -1,0 +1,143 @@
+{% extends "commons/base.html" %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <h1><i class="bi bi-graph-up"></i> Dashboard</h1>
+            <p class="text-muted">Vue d'ensemble de votre activité commerciale</p>
+        </div>
+    </div>
+
+    {% if error %}
+    <div class="alert alert-danger">
+        <i class="bi bi-exclamation-triangle"></i> {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Chiffre d'affaires du mois -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col-md-8">
+                            <h5 class="card-title">Chiffre d'affaires du mois</h5>
+                            <p class="text-muted">Revenus générés ce mois</p>
+                        </div>
+                        <div class="col-md-4 text-end">
+                            <h2 class="text-success">{{ monthly_revenue|floatformat:2 }}€</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Évolution des ventes sur 6 mois -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Évolution des ventes (6 derniers mois)</h5>
+                </div>
+                <div class="card-body">
+                    {% if sales_evolution %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    {% for month, revenue in sales_evolution.items %}
+                                    <th>{{ month }}</th>
+                                    {% endfor %}
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    {% for month, revenue in sales_evolution.items %}
+                                    <td>{{ revenue|floatformat:2 }}€</td>
+                                    {% endfor %}
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        Pas de données pour le moment
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mb-4">
+        <!-- Top 5 clients -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="bi bi-star-fill text-warning"></i> Top 5 Clients</h5>
+                </div>
+                <div class="card-body">
+                    {% if top_5_clients %}
+                    <div class="list-group">
+                        {% for client in top_5_clients %}
+                        <a href="{% url 'commons:contact_detail' client.contact_id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">{{ client.name }}</h6>
+                                <span class="badge bg-success">{{ client.revenue|floatformat:2 }}€</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info mb-0">
+                        Aucun client pour le moment
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Devis non transformés -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-0"><i class="bi bi-exclamation-circle text-warning"></i> Devis Non Convertis</h5>
+                </div>
+                <div class="card-body">
+                    {% if unconverted_quotes %}
+                    <div class="list-group">
+                        {% for quote in unconverted_quotes %}
+                        <a href="{% url 'sales:sales_order_detail' quote.id %}" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <div>
+                                    <h6 class="mb-1">{{ quote.contact }}</h6>
+                                    <small class="text-muted">{{ quote.genre }} - {{ quote.lines_count }} produit(s)</small>
+                                </div>
+                                <span class="badge bg-warning text-dark">En attente</span>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="alert alert-success mb-0">
+                        <i class="bi bi-check-circle"></i> Tous les devis ont été convertis !
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Retour -->
+    <div class="row">
+        <div class="col-md-12">
+            <a href="{% url 'commons:contact_list' %}" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Retour
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
