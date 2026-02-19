@@ -22,7 +22,6 @@ class DashboardService:
 
     def get_monthly_revenue(self):
         """Retourne le chiffre d'affaires du mois courant (factures existantes uniquement et réglées)"""
-        cache.delete('invoices_all')
         invoices = self.invoice_service.get_all_invoices()
 
         today = datetime.now()
@@ -38,7 +37,7 @@ class DashboardService:
                     try:
                         lines = self.invoice_order_line_service.get_invoice_order_lines_by_invoice(invoice.invoice_id)
                         for line in lines:
-                            total_revenue += Decimal(str(line.price_tax)) * line.quantity
+                            total_revenue += Decimal(str(line.price_tax))
                     except:
                         pass
 
@@ -73,7 +72,7 @@ class DashboardService:
                     try:
                         lines = self.invoice_order_line_service.get_invoice_order_lines_by_invoice(invoice.invoice_id)
                         for line in lines:
-                            evolution_data[month_label]['revenue'] += Decimal(str(line.price_tax)) * line.quantity
+                            evolution_data[month_label]['revenue'] += Decimal(str(line.price_tax))
                     except:
                         pass
 
@@ -100,7 +99,7 @@ class DashboardService:
 
                     lines = self.invoice_order_line_service.get_invoice_order_lines_by_invoice(invoice.invoice_id)
                     for line in lines:
-                        client_revenue[contact_id]['revenue'] += Decimal(str(line.price_tax)) * line.quantity
+                        client_revenue[contact_id]['revenue'] += Decimal(str(line.price_tax))
                 except:
                     pass
 

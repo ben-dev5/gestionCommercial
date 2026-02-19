@@ -14,7 +14,6 @@ from sales.sales_order_pdf import SalesOrderPDFService
 
 import csv
 from django.http import HttpResponse
-from django.views.generic import View
 
 
 class InvoiceListView(TemplateView):
@@ -238,7 +237,7 @@ class InvoiceExportCSVView(TemplateView):
             invoices = invoice_service.get_all_invoices()
 
             # Créer la réponse HTTP avec le type CSV
-            response = HttpResponse(content_type='text/csv')
+            response = HttpResponse(content_type='text/csv; charset=UTF-8')
             response['Content-Disposition'] = 'attachment; filename="factures.csv"'
 
             # Créer le writer CSV
@@ -265,8 +264,8 @@ class InvoiceExportCSVView(TemplateView):
                     lines = invoice_line_service.get_invoice_order_lines_by_invoice(invoice.invoice_id)
 
                     # Calculer les totaux
-                    total_ht = sum(line.price_ht * line.quantity for line in lines)
-                    total_ttc = sum(line.price_tax * line.quantity for line in lines)
+                    total_ht = sum(line.price_ht for line in lines)
+                    total_ttc = sum(line.price_tax for line in lines)
 
                     contact_name = f"{invoice.contact_id.first_name} {invoice.contact_id.last_name}"
 
