@@ -1,3 +1,4 @@
+from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView
 
 from dashboard.services.dashboard_service import DashboardService
@@ -6,6 +7,7 @@ from dashboard.services.dashboard_service import DashboardService
 class DashboardView(TemplateView):
     """Vue principale du dashboard"""
     template_name = 'dashboard/dashboard.html'
+
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

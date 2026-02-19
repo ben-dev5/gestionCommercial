@@ -25,4 +25,5 @@ class Invoice(models.Model):
     price_ht = models.IntegerField()
     tax = models.IntegerField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='En attente')
+    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
