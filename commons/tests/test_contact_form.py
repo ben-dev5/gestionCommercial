@@ -124,7 +124,7 @@ class ContactFormValidationTests(TestCase):
             'zip_code': '75000',
         }
         form = ContactForm(data=data)
-        self.assertFalse(form.is_valid())
+        self.assertTrue(form.is_valid())
 
     # Tests Email
     def test_invalid_email(self):

@@ -11,7 +11,7 @@ from commons.services.contact_service import ContactService
 
 
 class DashboardService:
-    """Service pour les statistiques et le dashboard"""
+    """Service pour dashboard"""
 
     def __init__(self):
         self.sales_order_service = SalesOrderService()
