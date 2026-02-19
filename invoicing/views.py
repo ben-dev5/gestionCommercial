@@ -12,6 +12,10 @@ from sales.services.sales_order_line_service import SalesOrderLineService
 from django.http import FileResponse
 from sales.sales_order_pdf import SalesOrderPDFService
 
+import csv
+from django.http import HttpResponse
+from django.views.generic import View
+
 
 class InvoiceListView(TemplateView):
     """Vue pour lister les factures"""
@@ -221,4 +225,69 @@ class InvoiceDeleteView(TemplateView):
             return redirect('invoicing:invoice_list')
         except Exception as e:
             messages.error(request, f"Erreur lors de la suppression : {str(e)}")
+            return redirect('invoicing:invoice_list')
+
+class InvoiceExportCSVView(TemplateView):
+    """Vue pour exporter la liste des factures en CSV"""
+    template_name = 'invoicing/invoice_list.html'
+    def get(self, request, *args, **kwargs):
+        invoice_service = InvoiceService()
+        invoice_line_service = InvoiceOrderLineService()
+
+        try:
+            invoices = invoice_service.get_all_invoices()
+
+            # Créer la réponse HTTP avec le type CSV
+            response = HttpResponse(content_type='text/csv')
+            response['Content-Disposition'] = 'attachment; filename="factures.csv"'
+
+            # Créer le writer CSV
+            writer = csv.writer(response)
+
+            # Ajouter l'en-tête
+            writer.writerow([
+                'ID Facture',
+                'Contact',
+                'Adresse',
+                'Ville',
+                'Code Postal',
+                'Email',
+                'Téléphone',
+                'Montant HT',
+                'Montant TTC',
+                'Statut',
+                'Date'
+            ])
+
+            # Ajouter les données des factures
+            for invoice in invoices:
+                try:
+                    lines = invoice_line_service.get_invoice_order_lines_by_invoice(invoice.invoice_id)
+
+                    # Calculer les totaux
+                    total_ht = sum(line.price_ht * line.quantity for line in lines)
+                    total_ttc = sum(line.price_tax * line.quantity for line in lines)
+
+                    contact_name = f"{invoice.contact_id.first_name} {invoice.contact_id.last_name}"
+
+                    writer.writerow([
+                        invoice.invoice_id,
+                        contact_name,
+                        invoice.address,
+                        invoice.city,
+                        invoice.zip_code,
+                        invoice.email,
+                        invoice.phone,
+                        f"{total_ht:.2f}",
+                        f"{total_ttc:.2f}",
+                        invoice.status,
+                        invoice.created_at.strftime('%d/%m/%Y') if hasattr(invoice, 'created_at') else 'N/A'
+                    ])
+                except:
+                    pass
+
+            return response
+
+        except Exception as e:
+            messages.error(request, f"Erreur lors de l'export : {str(e)}")
             return redirect('invoicing:invoice_list')
