@@ -144,6 +144,7 @@ class SalesOrderPDFService:
 
         # En-tête du tableau
         data = [[
+            Paragraph('<b>Date</b>', self.styles['Normal']),
             Paragraph('<b>Produit</b>', self.styles['Normal']),
             Paragraph('<b>Genre</b>', self.styles['Normal']),
             Paragraph('<b>Quantité</b>', self.styles['Normal']),
@@ -165,6 +166,7 @@ class SalesOrderPDFService:
             total_ttc += total_line_ttc
 
             data.append([
+                Paragraph(line.date.strftime('%d/%m/%Y') if line.date else '-', self.styles['Normal']),
                 Paragraph(line.product_id.product_description, self.styles['Normal']),
                 Paragraph(line.genre or '-', self.styles['Normal']),
                 Paragraph(str(line.quantity), self.styles['Normal']),

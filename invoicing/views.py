@@ -173,6 +173,7 @@ class InvoicePdfView(TemplateView):
             # Créer des adaptateurs pour les lignes
             class InvoiceLinePdfAdapter:
                 def __init__(self, line):
+                    self.date = line.date
                     self.product_id = line.product_id
                     self.genre = line.product_id.product_description  # Utiliser la description du produit comme genre
                     self.quantity = line.quantity
