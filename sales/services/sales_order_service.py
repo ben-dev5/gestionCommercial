@@ -86,6 +86,7 @@ class SalesOrderService:
 
         # Vérifier l'expiration
         if sales_order.public_hash_expires_at:
+            # date expirée
             if timezone.now() > sales_order.public_hash_expires_at:
                 self.invalidate_hash(sales_order)
                 return False

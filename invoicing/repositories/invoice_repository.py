@@ -1,11 +1,12 @@
 from invoicing.models.invoice_models import Invoice
+from django.utils import timezone
 
 
 class InvoiceRepository:
     def __init__(self):
         pass
 
-    def create_invoice(self, contact, name, address, city, state, zip_code, siret, email, phone, status='En attente'):
+    def create_invoice(self, contact, name, address, city, state, zip_code, siret, email, phone, status='En attente', created_at=None):
         """Créer une nouvelle facture"""
         invoice = Invoice.objects.create(
             contact_id=contact,
@@ -21,7 +22,8 @@ class InvoiceRepository:
             description_products='',
             price_ht=0,
             tax=0,
-            status=status
+            status=status,
+            created_at=timezone.now()
         )
         return invoice
 
@@ -40,7 +42,7 @@ class InvoiceRepository:
         """Récupérer les factures d'un contact"""
         return Invoice.objects.filter(contact_id=contact_id)
 
-    def update_invoice(self, invoice_id, contact, name, address, city, state, zip_code, siret, email, phone, status):
+    def update_invoice(self, invoice_id, contact, name, address, city, state, zip_code, siret, email, phone, status, created_at=None):
         """Mettre à jour une facture"""
         invoice = self.get_invoice_by_id(invoice_id)
         invoice.contact_id = contact
@@ -53,6 +55,8 @@ class InvoiceRepository:
         invoice.email = email
         invoice.phone = phone
         invoice.status = status
+        if created_at is not None:
+            invoice.created_at = created_at
         invoice.save()
         return invoice
 

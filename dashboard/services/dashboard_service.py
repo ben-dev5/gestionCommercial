@@ -50,23 +50,34 @@ class DashboardService:
         evolution_data = {}
         today = datetime.now()
 
-        # Créer les labels pour 6 mois précédents
+        # Créer les labels pour les 6 derniers mois (en remontant dans le temps)
         for i in range(6):
-            month_date = today - timedelta(days=today.day - 1)
-            for _ in range(i):
-                if month_date.month == 1:
-                    month_date = month_date.replace(year=month_date.year - 1, month=12)
-                else:
-                    month_date = month_date.replace(month=month_date.month - 1)
+            # Calculer la date du premier jour du mois
+            if i == 0:
+                # Mois courant
+                month_date = today.replace(day=1)
+            else:
+                # Mois précédents
+                month_date = today.replace(day=1)
+                for _ in range(i):
+                    # Reculer d'un mois
+                    if month_date.month == 1:
+                        month_date = month_date.replace(year=month_date.year - 1, month=12)
+                    else:
+                        month_date = month_date.replace(month=month_date.month - 1)
 
-            month_label = month_date.strftime('%B %Y')
-            evolution_data[month_label] = {'month': month_date.month, 'year': month_date.year, 'revenue': Decimal('0.00')}
+            month_label = month_date.strftime('%b %Y')
+            evolution_data[month_label] = {
+                'month': month_date.month,
+                'year': month_date.year,
+                'revenue': Decimal('0.00')
+            }
 
         # Remplir avec les factures existantes et réglées
         for invoice in invoices:
             if invoice.status == 'réglé' and hasattr(invoice, 'created_at') and invoice.created_at:
                 invoice_date = invoice.created_at if isinstance(invoice.created_at, datetime) else datetime.fromisoformat(str(invoice.created_at))
-                month_label = invoice_date.strftime('%B %Y')
+                month_label = invoice_date.strftime('%b %Y')
 
                 if month_label in evolution_data:
                     try:
@@ -76,6 +87,7 @@ class DashboardService:
                     except:
                         pass
 
+        # Retourner au format dictionnaire simple {mois: revenue}
         return {k: float(v['revenue']) for k, v in evolution_data.items()}
 
     def get_top_5_clients(self):

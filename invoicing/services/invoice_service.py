@@ -31,11 +31,11 @@ class InvoiceService:
         if not zip_code or zip_code.strip() == "":
             raise ValueError("Le code postal ne peut pas être vide")
 
-    def create_invoice(self, contact_id, name, address, city, state, zip_code, siret, email, phone, status='En attente'):
+    def create_invoice(self, contact_id, name, address, city, state, zip_code, siret, email, phone, status='En attente', created_at=None):
         """Créer une nouvelle facture"""
         self.validate_invoice_data(contact_id, name, address, city, state, zip_code, siret, email, phone)
         contact = self.contact_service.get_contact_by_id(contact_id)
-        return self.repo.create_invoice(contact, name, address, city, state, zip_code, siret, email, phone, status)
+        return self.repo.create_invoice(contact, name, address, city, state, zip_code, siret, email, phone, status, created_at)
 
     def delete_invoice(self, invoice_id):
         """Supprimer une facture"""
@@ -53,9 +53,9 @@ class InvoiceService:
         """Récupérer les factures d'un contact"""
         return self.repo.get_invoices_by_contact(contact_id)
 
-    def update_invoice(self, invoice_id, contact_id, name, address, city, state, zip_code, siret, email, phone, status):
+    def update_invoice(self, invoice_id, contact_id, name, address, city, state, zip_code, siret, email, phone, status, created_at=None):
         """Mettre à jour une facture"""
         self.validate_invoice_data(contact_id, name, address, city, state, zip_code, siret, email, phone)
         contact = self.contact_service.get_contact_by_id(contact_id)
-        return self.repo.update_invoice(invoice_id, contact, name, address, city, state, zip_code, siret, email, phone, status)
+        return self.repo.update_invoice(invoice_id, contact, name, address, city, state, zip_code, siret, email, phone, status, created_at)
 

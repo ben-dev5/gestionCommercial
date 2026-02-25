@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 
 from commons.models.contact_models import Contact
 
@@ -25,5 +26,6 @@ class Invoice(models.Model):
     price_ht = models.IntegerField()
     tax = models.IntegerField()
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='En attente')
-    created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+    # rendre la date non automatique pour pouvoir la renseigner lors de la création d'une facture à partir d'un devis
+    created_at = models.DateTimeField(auto_now_add=False, null=False, default=timezone.now)
 

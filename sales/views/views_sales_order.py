@@ -49,7 +49,7 @@ class SalesOrderDetailView(TemplateView):
                 # Vérifier que le hash correspond ET qu'il est valide
                 if service.get_public_hash(sales_order) == public_hash and service.is_hash_valid(sales_order):
                     context['is_public_access'] = True
-                # Sinon on affiche juste un accès admin normal, pas d'erreur
+                    # Sinon, on affiche juste un accès admin normal, pas d'erreur
 
             # Afficher le lien public temporairement s'il vient d'être généré
             if 'show_public_link' in self.request.session:

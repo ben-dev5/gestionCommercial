@@ -1,6 +1,4 @@
-from django.views.decorators.cache import never_cache
 from django.views.generic import TemplateView
-
 from dashboard.services.dashboard_service import DashboardService
 
 
