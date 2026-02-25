@@ -1,4 +1,5 @@
 from django.views.generic import TemplateView
+import json
 from dashboard.services.dashboard_service import DashboardService
 
 
@@ -15,7 +16,7 @@ class DashboardView(TemplateView):
             stats = service.get_dashboard_stats()
 
             context['monthly_revenue'] = stats['monthly_revenue']
-            context['sales_evolution'] = stats['sales_evolution']
+            context['sales_evolution'] = json.dumps(stats['sales_evolution'])
             context['top_5_clients'] = stats['top_5_clients']
             context['unconverted_quotes'] = stats['unconverted_quotes']
 

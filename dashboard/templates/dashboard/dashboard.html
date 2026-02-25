@@ -1,5 +1,4 @@
 {% extends "commons/base.html" %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 {% block content %}
 <div class="container-fluid mt-4">
     <div class="row mb-4">
@@ -36,36 +35,15 @@
 
     <!-- Évolution des ventes sur 6 mois -->
     <div class="row mb-4">
-        <div class="col-md-12">
+        <div class="col-md-7">
             <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Évolution des ventes (6 derniers mois)</h5>
                 </div>
                 <div class="card-body">
-                    {% if sales_evolution %}
-                    <div class="table-responsive">
-                        <table class="table">
-                            <thead>
-                                <tr>
-                                    {% for month, revenue in sales_evolution.items %}
-                                    <th>{{ month }}</th>
-                                    {% endfor %}
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    {% for month, revenue in sales_evolution.items %}
-                                    <td>{{ revenue|floatformat:2 }}€</td>
-                                    {% endfor %}
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div style="position: relative; height: 400px; width: 100%;">
+                        <canvas id="salesEvolutionChart"></canvas>
                     </div>
-                    {% else %}
-                    <div class="alert alert-info">
-                        Pas de données pour le moment
-                    </div>
-                    {% endif %}
                 </div>
             </div>
         </div>
@@ -139,5 +117,68 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOMContentLoaded déclenché');
+
+        // Récupérer les données de sales_evolution depuis Django
+        const salesEvolutionData = JSON.parse('{{ sales_evolution|safe }}');
+        console.log('Données sales_evolution:', salesEvolutionData);
+        console.log('Type de salesEvolutionData:', typeof salesEvolutionData);
+
+        // Préparer les labels et les données pour le graphique
+        const labels = Object.keys(salesEvolutionData);
+        const revenues = Object.values(salesEvolutionData);
+        console.log('Labels:', labels);
+        console.log('Revenues:', revenues);
+
+        // Vérifier si le canvas existe
+        const canvas = document.getElementById('salesEvolutionChart');
+        console.log('Canvas trouvé:', canvas);
+
+        if (canvas) {
+            // Initialiser le graphique Chart.js
+            const ctx = canvas.getContext('2d');
+            console.log('Contexte 2D obtenu:', ctx);
+
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Chiffre d\'affaires (€)',
+                        data: revenues,
+                        backgroundColor: '#0d6efd',
+                        borderColor: '#0d6efd',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Chiffre d\'affaires (€)'
+                            }
+                        }
+                    }
+                }
+            });
+            console.log('Graphique créé avec succès');
+        } else {
+            console.error('Canvas #salesEvolutionChart non trouvé');
+        }
+    });
+</script>
+{% endblock %}
