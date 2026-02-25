@@ -35,3 +35,10 @@ class SalesOrderRepository:
         sales_order.save()
         return sales_order
 
+    def save(self, sales_order):
+        sales_order.save()
+        return sales_order
+
+    def get_by_public_hash(self, public_hash):
+        return SalesOrder.objects.get(public_hash=public_hash)
+

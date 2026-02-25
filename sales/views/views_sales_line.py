@@ -1,5 +1,4 @@
 from django.shortcuts import redirect
-from django.template import context
 from django.views.generic import TemplateView
 from django.http import Http404, FileResponse
 from django.contrib import messages
@@ -8,7 +7,7 @@ from sales.services.sales_order_service import SalesOrderService
 from sales.services.sales_order_line_service import SalesOrderLineService
 from sales.sales_order_pdf import SalesOrderPDFService
 from products.services.product_service import ProductService
-from sales.forms import SalesOrderForm, SalesOrderLineForm
+from sales.forms import  SalesOrderLineForm
 
 
 class SalesOrderLineCreateView(TemplateView):

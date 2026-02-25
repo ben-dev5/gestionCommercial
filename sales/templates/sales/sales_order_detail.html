@@ -1,45 +1,86 @@
 {% extends "commons/base.html" %}
 
 {% block content %}
+{% if is_public_access %}
+<!-- Interface client minimaliste -->
+<style>
+    .navbar { display: none !important; }
+    .sidebar { display: none !important; }
+    .container { max-width: 800px; }
+</style>
+{% endif %}
+
 <div class="container mt-4">
     <div class="row mb-4">
         <div class="col-md-8">
-            <h1>{% if sales_order.type == 'Devis' %}Devis{% else %}Commande{% endif %}</h1>
+            <h1>{% if sales_order.type == 'Devis' %}Devis n°{{ sales_order.sales_order_id }}{% else %}Commande n°{{ sales_order.sales_order_id }}{% endif %}</h1>
             <p class="text-muted">{{ sales_order.contact_id.first_name }} {{ sales_order.contact_id.last_name }}</p>
         </div>
         <div class="col-md-4 text-end">
-            {% if has_lines %}
-                <a href="{% url 'sales:sales_order_pdf' sales_order.pk %}" class="btn btn-primary" title="Télécharger en PDF">
-                    <i class="bi bi-file-pdf"></i> PDF
-                </a>
-            {% if sales_order.type == 'Commande' %}
-                <form method="post" action="{% url 'invoicing:create_from_sales' sales_order.pk %}" style="display:inline;">
-                    {% csrf_token %}
-                    <button type="submit" class="btn btn-success" title="Créer une facture à partir de ce devis/commande">
-                        <i class="bi bi-receipt"></i> Créer facture
+            {% if is_public_access %}
+                <!-- Accès public : affichage et signature seulement -->
+                {% if has_lines %}
+                    <a href="{% url 'sales:sales_order_pdf' sales_order.pk %}" class="btn btn-primary" title="Télécharger en PDF">
+                        <i class="bi bi-file-pdf"></i> PDF
+                    </a>
+                    {% if sales_order.status != 'Signé' %}
+                        <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmSignModal" title="Signer ce devis/commande">
+                            <i class="bi bi-check-circle"></i> J'accepte
+                        </button>
+                    {% else %}
+                        <button class="btn btn-success" disabled title="Déjà signé le {{ sales_order.signed_at|date:'d/m/Y à H:i' }}">
+                            <i class="bi bi-check-circle-fill"></i> Signé
+                        </button>
+                    {% endif %}
+                {% else %}
+                    <button class="btn btn-primary" disabled title="Aucun produit ajouté">
+                        <i class="bi bi-file-pdf"></i> PDF
                     </button>
-                </form>
-            {%endif%}
-                <a href="{% url 'sales:sales_order_update' sales_order.pk %}" class="btn btn-warning">
-                    <i class="bi bi-pencil"></i> Modifier
-                </a>
-                <a href="{% url 'sales:sales_order_delete' sales_order.pk %}" class="btn btn-danger">
-                    <i class="bi bi-trash"></i> Supprimer
-                </a>
+                {% endif %}
             {% else %}
-                <button class="btn btn-primary" disabled title="Ajoutez d'abord un produit">
-                    <i class="bi bi-file-pdf"></i> PDF
-                </button>
-                <button class="btn btn-warning" disabled title="Ajoutez d'abord un produit">
-                    <i class="bi bi-pencil"></i> Modifier
-                </button>
-                <button class="btn btn-danger" disabled title="Ajoutez d'abord un produit">
-                    <i class="bi bi-trash"></i> Supprimer
-                </button>
+                <!-- Accès admin : toutes les actions disponibles -->
+                {% if has_lines %}
+                    <a href="{% url 'sales:sales_order_pdf' sales_order.pk %}" class="btn btn-primary" title="Télécharger en PDF">
+                        <i class="bi bi-file-pdf"></i> PDF
+                    </a>
+                    {% if sales_order.type == 'Commande' %}
+                        <form method="post" action="{% url 'invoicing:create_from_sales' sales_order.pk %}" style="display:inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-success" title="Créer une facture à partir de ce devis/commande">
+                                <i class="bi bi-receipt"></i> Créer facture
+                            </button>
+                        </form>
+                    {%endif%}
+                    {% if sales_order.type == 'Devis' %}
+                    <form method="post" style="display:inline;">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="generate_link">
+                        <button type="submit" class="btn btn-info" title="Générer un lien public pour partager au client">
+                            <i class="bi bi-share"></i> Partager
+                        </button>
+                    </form>
+                    {% endif %}
+                    <a href="{% url 'sales:sales_order_update' sales_order.pk %}" class="btn btn-warning">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </a>
+                    <a href="{% url 'sales:sales_order_delete' sales_order.pk %}" class="btn btn-danger">
+                        <i class="bi bi-trash"></i> Supprimer
+                    </a>
+                {% else %}
+                    <button class="btn btn-primary" disabled title="Ajoutez d'abord un produit">
+                        <i class="bi bi-file-pdf"></i> PDF
+                    </button>
+                    <button class="btn btn-warning" disabled title="Ajoutez d'abord un produit">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </button>
+                    <button class="btn btn-danger" disabled title="Ajoutez d'abord un produit">
+                        <i class="bi bi-trash"></i> Supprimer
+                    </button>
+                {% endif %}
+                <a href="{% url 'sales:sales_order_list' %}" class="btn btn-secondary">
+                    <i class="bi bi-arrow-left"></i> Retour
+                </a>
             {% endif %}
-            <a href="{% url 'sales:sales_order_list' %}" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Retour
-            </a>
         </div>
     </div>
 
@@ -49,6 +90,18 @@
         <a href="{% url 'sales:sales_order_line_create' sales_order.pk %}" class="btn btn-sm btn-warning ms-2">
             <i class="bi bi-plus-circle"></i> Ajouter le premier produit
         </a>
+    </div>
+    {% endif %}
+
+    {% if public_link and not is_public_access %}
+    <div class="alert alert-info alert-dismissible fade show" role="alert">
+        <i class="bi bi-info-circle"></i> <strong>Lien public :</strong>
+        <div class="input-group mt-2">
+            <input type="text" class="form-control" value="{{ public_link }}" readonly>
+            <button class="btn btn-outline-secondary" type="button" onclick="navigator.clipboard.writeText('{{ public_link }}'); alert('Lien copié !')">
+                <i class="bi bi-files"></i> Copier
+            </button>
+        </div>
     </div>
     {% endif %}
 
@@ -71,9 +124,11 @@
     <div class="card">
         <div class="card-header d-flex justify-content-between align-items-center">
             <h5 class="card-title mb-0">Lignes du devis/commande</h5>
-            <a href="{% url 'sales:sales_order_line_create' sales_order.pk %}" class="btn btn-secondary btn-sm">
-                <i class="bi bi-plus-circle"></i> Ajouter un produit
-            </a>
+            {% if not is_public_access %}
+                <a href="{% url 'sales:sales_order_line_create' sales_order.pk %}" class="btn btn-secondary btn-sm">
+                    <i class="bi bi-plus-circle"></i> Ajouter un produit
+                </a>
+            {% endif %}
         </div>
         <div class="card-body">
             {% if lines %}
@@ -102,9 +157,11 @@
                                 <td>{{ line.total_ht|floatformat:2 }}€</td>
                                 <td class="fw-bold text-success">{{ line.price_it|floatformat:2 }}€</td>
                                 <td>
-                                    <a href="{% url 'sales:sales_order_line_delete' sales_order.pk line.pk %}" class="btn btn-sm btn-outline-danger">
-                                        <i class="bi bi-trash"></i>
-                                    </a>
+                                    {% if not is_public_access %}
+                                        <a href="{% url 'sales:sales_order_line_delete' sales_order.pk line.pk %}" class="btn btn-sm btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    {% endif %}
                                 </td>
                             </tr>
                         {% endfor %}
@@ -120,5 +177,44 @@
         </div>
     </div>
 </div>
+
+<!-- Modal de confirmation de signature -->
+{% if is_public_access %}
+<div class="modal fade" id="confirmSignModal" tabindex="-1" aria-labelledby="confirmSignLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title" id="confirmSignLabel">
+                    <i class="bi bi-check-circle"></i> Confirmer la signature
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="text-muted mb-3">
+                    En cliquant sur "J'accepte", vous confirmez que vous acceptez ce {% if sales_order.type == 'Devis' %}devis{% else %}commande{% endif %}.
+                </p>
+                <div class="alert alert-info">
+                    <strong>Informations :</strong><br>
+                    Numéro : <strong>{{ sales_order.sales_order_id }}</strong><br>
+                    Client : <strong>{{ sales_order.contact_id.first_name }} {{ sales_order.contact_id.last_name }}</strong>
+                </div>
+                <p class="small text-muted">
+                    Cette action est irréversible. Une date et heure de signature seront enregistrées.
+                </p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form method="post" style="display:inline;">
+                    {% csrf_token %}
+                    <input type="hidden" name="action" value="sign">
+                    <button type="submit" class="btn btn-success">
+                        <i class="bi bi-check-circle"></i> J'accepte
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endif %}
 {% endblock %}
 
