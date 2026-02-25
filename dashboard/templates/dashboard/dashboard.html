@@ -121,7 +121,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        console.log('DOMContentLoaded déclenché');
 
         // Récupérer les données de sales_evolution depuis Django
         const salesEvolutionData = JSON.parse('{{ sales_evolution|safe }}');
