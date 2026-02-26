@@ -116,9 +116,12 @@ class SalesOrderService:
         return sales_order
 
     def sign_sales_order(self, sales_order, client_ip=None):
-        """Marque le devis comme signé par le client"""
+        """Marque le devis comme signé par le client et change le type en commande"""
         if sales_order.status == 'Signé':
             raise ValueError("Ce devis/commande est déjà signé")
+
+        if sales_order.type == 'Devis':
+            sales_order.type = 'Commande'
 
         # Mettre à jour le statut
         sales_order.status = 'Signé'
