@@ -14,6 +14,16 @@ class ProductListView(TemplateView):
         context = super().get_context_data(**kwargs)
         service = ProductService()
         context['products'] = service.get_all_products()
+
+        products = service.get_all_products()
+
+        # méthode de recherche de produits par description
+        search_query = self.request.GET.get('search', '').strip()
+        if search_query:
+            context['products'] = [
+                product for product in products
+                if search_query.lower() in product.product_description.lower()
+            ]
         return context
 
 

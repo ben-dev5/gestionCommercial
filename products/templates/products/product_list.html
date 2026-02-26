@@ -13,6 +13,22 @@
         </div>
     </div>
 
+    <div class="row mb-4">
+    <div class="col-md-12">
+        <form method="get" class="d-flex gap-2" style="align-items: center;">
+            <input type="text" name="search" class="form-control form-control-sm" placeholder="Rechercher produit..." value="{{ request.GET.search }}" style="padding: 0.4rem 0.75rem; font-size: 0.9rem;">
+            <button type="submit" class="btn btn-secondary btn-sm" title="Chercher">
+                <i class="bi bi-search"></i>
+            </button>
+            {% if request.GET.search %}
+                <a href="{% url 'products:product_list' %}" class="btn btn-outline-secondary btn-sm" title="Réinitialiser">
+                    <i class="bi bi-x-circle"></i>
+                </a>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
     {% if products %}
     <div class="table-responsive">
         <table class="table table-hover">
