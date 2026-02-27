@@ -3,6 +3,7 @@ from django.views.generic import TemplateView
 from django.contrib import messages
 from django.http import Http404
 
+from commons.dtos import CreateContactDTO, UpdateContactDTO
 from commons.services.contact_service import ContactService
 from commons.forms import ContactForm
 from sales.services.sales_order_service import SalesOrderService
@@ -61,8 +62,7 @@ class ContactCreateView(TemplateView):
         form = ContactForm(request.POST)
         if form.is_valid():
             service = ContactService()
-            contact = service.create_contact(
-                contact_id=None,
+            dto = CreateContactDTO(
                 first_name=form.cleaned_data['first_name'],
                 last_name=form.cleaned_data['last_name'],
                 email=form.cleaned_data['email'],
@@ -74,7 +74,8 @@ class ContactCreateView(TemplateView):
                 state=form.cleaned_data['state'],
                 zip_code=form.cleaned_data['zip_code'],
             )
-            messages.success(request, f"Contact {contact.first_name} {contact.last_name} créé avec succès !")
+            contact = service.create_contact(dto)
+            messages.success(request, f"Contact créé avec succès !")
             return redirect('commons:contact_list')
         return self.render_to_response(self.get_context_data())
 
@@ -119,8 +120,8 @@ class ContactUpdateView(TemplateView):
 
         form = ContactForm(request.POST)
         if form.is_valid():
-            updated_contact = service.update_contact(
-                contact_id=contact.contact_id,
+
+            dto = UpdateContactDTO(
                 first_name=form.cleaned_data['first_name'],
                 last_name=form.cleaned_data['last_name'],
                 email=form.cleaned_data['email'],
@@ -132,6 +133,7 @@ class ContactUpdateView(TemplateView):
                 state=form.cleaned_data['state'],
                 zip_code=form.cleaned_data['zip_code'],
             )
+            updated_contact = service.update_contact(contact.contact_id, dto)
             messages.success(request, f"Contact {updated_contact.first_name} {updated_contact.last_name} modifié avec succès !")
             return redirect('commons:contact_list')
         return self.render_to_response(self.get_context_data())

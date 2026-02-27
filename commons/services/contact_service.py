@@ -1,3 +1,5 @@
+from commons.dtos import CreateContactDTO, UpdateContactDTO
+from commons.models import Contact
 from commons.repositories.contact_repository import ContactRepository
 
 
@@ -6,8 +8,8 @@ class ContactService:
     def __init__(self):
         self.repo = ContactRepository()
 
-    def create_contact(self, contact_id, first_name, last_name, email, phone, type, siret, address, city, state, zip_code):
-        return self.repo.create_contact(contact_id, first_name, last_name, email, phone, type, siret, address, city, state, zip_code)
+    def create_contact(self, dto: CreateContactDTO)-> Contact:
+        return self.repo.create_contact(dto)
 
     def delete_contact(self, contact_id):
         return self.repo.delete_contact(contact_id)
@@ -18,5 +20,5 @@ class ContactService:
     def get_contact_by_id(self, contact_id):
         return self.repo.get_contact_by_id(contact_id)
 
-    def update_contact(self, contact_id, first_name, last_name, email, phone, type, siret, address, city, state, zip_code):
-        return self.repo.update_contact(contact_id, first_name, last_name, email, phone, type, siret, address, city, state, zip_code)
+    def update_contact(self,contact_id,dto: UpdateContactDTO) -> Contact:
+        return self.repo.update_contact(contact_id,dto)
