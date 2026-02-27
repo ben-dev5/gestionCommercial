@@ -1,7 +1,4 @@
-from django.shortcuts import redirect
-from django.views.generic import TemplateView
 from django.http import Http404
-from django.contrib import messages
 from datetime import datetime
 
 from invoicing.services.invoice_service import InvoiceService
@@ -11,9 +8,15 @@ from sales.services.sales_order_service import SalesOrderService
 from sales.services.sales_order_line_service import SalesOrderLineService
 from django.http import FileResponse
 from sales.sales_order_pdf import SalesOrderPDFService
-
 import csv
+import logging
+from decimal import Decimal, InvalidOperation
+
 from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.contrib import messages
+from django.views.generic import TemplateView
+
 
 
 class InvoiceListView(TemplateView):
@@ -252,9 +255,14 @@ class InvoiceDeleteView(TemplateView):
             messages.error(request, f"Erreur lors de la suppression : {str(e)}")
             return redirect('invoicing:invoice_list')
 
+
+
+logger = logging.getLogger(__name__)
+
 class InvoiceExportCSVView(TemplateView):
     """Vue pour exporter la liste des factures en CSV"""
     template_name = 'invoicing/invoice_list.html'
+
     def get(self, request, *args, **kwargs):
         invoice_service = InvoiceService()
         invoice_line_service = InvoiceOrderLineService()
@@ -262,14 +270,16 @@ class InvoiceExportCSVView(TemplateView):
         try:
             invoices = invoice_service.get_all_invoices()
 
-            # Créer la réponse HTTP avec le type CSV
-            response = HttpResponse(content_type='text/csv; charset=UTF-8')
+            response = HttpResponse(content_type='text/csv; charset=utf-8')
             response['Content-Disposition'] = 'attachment; filename="factures.csv"'
 
-            # Créer le writer CSV
-            writer = csv.writer(response)
+            response.write('sep=;\n')
+            # BOM pour Excel (UTF-8)
+            response.write('\ufeff')
 
-            # Ajouter l'en-tête
+            writer = csv.writer(response,delimiter=';', quoting=csv.QUOTE_MINIMAL)
+
+            # En-tête
             writer.writerow([
                 'ID Facture',
                 'Contact',
@@ -284,35 +294,55 @@ class InvoiceExportCSVView(TemplateView):
                 'Date'
             ])
 
-            # Ajouter les données des factures
             for invoice in invoices:
                 try:
                     lines = invoice_line_service.get_invoice_order_lines_by_invoice(invoice.invoice_id)
 
-                    # Calculer les totaux
-                    total_ht = sum(line.price_ht for line in lines)
-                    total_ttc = sum(line.price_tax for line in lines)
+                    # Sommes en Decimal (sécurité sur les types)
+                    total_ht = sum(
+                        (Decimal(getattr(line, 'price_ht', 0)) for line in lines),
+                        Decimal('0.00')
+                    )
+                    total_ttc = sum(
+                        (Decimal(getattr(line, 'price_tax', 0)) for line in lines),
+                        Decimal('0.00')
+                    )
 
-                    contact_name = f"{invoice.contact_id.first_name} {invoice.contact_id.last_name}"
+                    contact = getattr(invoice, 'contact_id', None)
+                    contact_name = ""
+                    if contact:
+                        first = getattr(contact, 'first_name', '') or ''
+                        last = getattr(contact, 'last_name', '') or ''
+                        contact_name = (first + ' ' + last).strip()
+
+                    created_at = getattr(invoice, 'created_at', None)
+                    date_str = created_at.strftime('%d/%m/%Y') if created_at else 'N/A'
 
                     writer.writerow([
                         invoice.invoice_id,
                         contact_name,
-                        invoice.address,
-                        invoice.city,
-                        invoice.zip_code,
-                        invoice.email,
-                        invoice.phone,
+                        getattr(invoice, 'address', ''),
+                        getattr(invoice, 'city', ''),
+                        getattr(invoice, 'zip_code', ''),
+                        getattr(invoice, 'email', ''),
+                        getattr(invoice, 'phone', ''),
                         f"{total_ht:.2f}",
                         f"{total_ttc:.2f}",
-                        invoice.status,
-                        invoice.created_at.strftime('%d/%m/%Y') if hasattr(invoice, 'created_at') else 'N/A'
+                        getattr(invoice, 'status', ''),
+                        date_str
                     ])
-                except:
-                    pass
+                except (InvalidOperation, ValueError) as exc:
+                    # Erreur sur un calcul/formatage : log et continuer
+                    logger.exception("Erreur de calcul sur la facture %s: %s", getattr(invoice, 'invoice_id', '?'), exc)
+                    continue
+                except Exception as exc:
+                    # Erreur inattendue sur une facture : log et continuer
+                    logger.exception("Erreur lors du traitement de la facture %s", getattr(invoice, 'invoice_id', '?'))
+                    continue
 
             return response
 
         except Exception as e:
+            logger.exception("Erreur lors de l'export des factures")
             messages.error(request, f"Erreur lors de l'export : {str(e)}")
             return redirect('invoicing:invoice_list')
