@@ -27,4 +27,17 @@ class UpdateContactDTO:
     type: Optional[str] = None
     siret: Optional[str] = None
 
+@dataclass
+class ContactDTO:
+    contact_id: int
+    first_name: str
+    last_name: str
+    email: str
+    phone: str
+    address: str
+    city: str
+    state: str
+    zip_code: str
+    type: str
+    siret: str
 

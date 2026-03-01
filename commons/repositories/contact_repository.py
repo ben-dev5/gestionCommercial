@@ -1,11 +1,11 @@
-from commons.dtos import CreateContactDTO, UpdateContactDTO
+from commons.dtos import CreateContactDTO, UpdateContactDTO, ContactDTO
 from commons.models import Contact
 
 
 class ContactRepository:
 
-    def create_contact(self, dto: CreateContactDTO) -> Contact:
-        return Contact.objects.create(
+    def create_contact(self, dto: CreateContactDTO) -> ContactDTO:
+        contact = Contact.objects.create(
             first_name=dto.first_name,
             last_name=dto.last_name,
             email=dto.email,
@@ -17,6 +17,7 @@ class ContactRepository:
             state=dto.state,
             zip_code=dto.zip_code
         )
+        return self._model_to_dto(contact)
 
     def get_contact_id(self, contact_id):
         return Contact.objects.get(contact_id=contact_id).contact_id
@@ -30,12 +31,14 @@ class ContactRepository:
         return True
 
     def get_all_contacts(self):
-        return Contact.objects.all().order_by('last_name')
+        contacts = Contact.objects.all().order_by('last_name')
+        return [self._model_to_dto(contact) for contact in contacts]
 
-    def get_contact_by_id(self, contact_id):
-        return Contact.objects.get(contact_id=contact_id)
+    def get_contact_by_id(self, contact_id) -> ContactDTO:
+        contact = Contact.objects.get(contact_id=contact_id)
+        return self._model_to_dto(contact)
 
-    def update_contact(self,  contact_id,dto: UpdateContactDTO) -> Contact:
+    def update_contact(self, contact_id, dto: UpdateContactDTO) -> ContactDTO:
         contact = Contact.objects.get(contact_id=contact_id)
         if dto.first_name is not None:
             contact.first_name = dto.first_name
@@ -58,4 +61,19 @@ class ContactRepository:
         if dto.zip_code is not None:
             contact.zip_code = dto.zip_code
         contact.save()
-        return contact
+        return self._model_to_dto(contact)
+
+    def _model_to_dto(self, contact: Contact) -> ContactDTO:
+        return ContactDTO(
+            contact_id=contact.contact_id,
+            first_name=contact.first_name,
+            last_name=contact.last_name,
+            email=contact.email,
+            phone=contact.phone,
+            type=contact.type,
+            siret=contact.siret,
+            address=contact.address,
+            city=contact.city,
+            state=contact.state,
+            zip_code=contact.zip_code
+        )
