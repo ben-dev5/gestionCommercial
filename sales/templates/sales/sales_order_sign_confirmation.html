@@ -1,0 +1,37 @@
+{% extends "commons/base.html" %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-success">
+                <div class="card-header bg-success text-white text-center">
+                    <h5 class="card-title mb-0">
+                        <i class="bi bi-check-circle-fill"></i> Signature confirmée
+                    </h5>
+                </div>
+                <div class="card-body text-center">
+                    <p class="fs-5 mb-4">
+                        <i class="bi bi-check-circle text-success" style="font-size: 3rem;"></i>
+                    </p>
+                    <h6>Merci !</h6>
+                    <p class="text-muted">
+                        Votre {% if sales_order.type == 'Devis' %}devis{% else %}commande{% endif %} a été signé avec succès.
+                    </p>
+
+                    <div class="alert alert-info mt-3">
+                        <strong>Numéro :</strong> {{ sales_order.sales_order_id }}<br>
+                        <strong>Date de signature :</strong> {{ sales_order.signed_at|date:"d/m/Y à H:i" }}<br>
+                        <strong>Client :</strong> {{ sales_order.contact_id.first_name }} {{ sales_order.contact_id.last_name }}
+                    </div>
+
+                    <p class="text-muted small mt-3">
+                        Un email de confirmation a été envoyé à {{ sales_order.contact_id.email }}
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

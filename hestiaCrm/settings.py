@@ -44,7 +44,8 @@ INSTALLED_APPS = [
     'statics',
     'tests',
     'products',
-    'dashboard'
+    'dashboard',
+    'payment'
 ]
 
 MIDDLEWARE = [

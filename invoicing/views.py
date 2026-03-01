@@ -274,7 +274,7 @@ class InvoiceExportCSVView(TemplateView):
             response['Content-Disposition'] = 'attachment; filename="factures.csv"'
 
             response.write('sep=;\n')
-            # BOM pour Excel (UTF-8)
+
             response.write('\ufeff')
 
             writer = csv.writer(response,delimiter=';', quoting=csv.QUOTE_MINIMAL)
