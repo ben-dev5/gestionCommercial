@@ -68,27 +68,33 @@ class InvoiceDetailView(TemplateView):
         try:
             invoice = invoice_service.get_invoice_by_id(pk)
 
+            # Récupérer la date et le status du formulaire
+            new_date = invoice.created_at
+            new_status = invoice.status
 
             if 'created_at' in request.POST:
                 form = InvoiceDateForm(request.POST)
                 if form.is_valid():
                     new_date = form.cleaned_data['created_at']
-                    invoice_service.update_invoice(
-                        invoice_id=pk,
-                        contact_id=invoice.contact_id.contact_id,
-                        name=invoice.name,
-                        address=invoice.address,
-                        city=invoice.city,
-                        state=invoice.state,
-                        zip_code=invoice.zip_code,
-                        siret=invoice.siret,
-                        email=invoice.email,
-                        phone=invoice.phone,
-                        created_at=new_date
-                    )
-                    messages.success(request, "Date mise à jour")
-                else:
-                    messages.error(request, "Erreur lors de la mise à jour de la date")
+
+            if 'status' in request.POST:
+                new_status = request.POST.get('status')
+
+            invoice_service.update_invoice(
+                invoice_id=pk,
+                contact_id=invoice.contact_id.contact_id,
+                name=invoice.name,
+                address=invoice.address,
+                city=invoice.city,
+                state=invoice.state,
+                zip_code=invoice.zip_code,
+                siret=invoice.siret,
+                email=invoice.email,
+                phone=invoice.phone,
+                status=new_status,
+                created_at=new_date
+            )
+            messages.success(request, "Facture mise à jour")
 
         except Exception as e:
             messages.error(request, f"Erreur : {str(e)}")
