@@ -11,6 +11,9 @@ class PaymentService:
     def get_payment_by_id(self, payment_id):
         return self.repo.get_payment_by_id(payment_id)
 
+    def get_payments_by_invoice_id(self, invoice_id):
+        return self.repo.get_payments_by_invoice_id(invoice_id)
+
     def get_all_payments(self):
         return self.repo.get_all_payments()
 

@@ -19,6 +19,7 @@
                                         <th>Méthode</th>
                                         <th>Status</th>
                                         <th>Date</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -39,18 +40,28 @@
                                                 {% endif %}
                                             </td>
                                             <td>{{ payment.created_at|date:"d/m/Y H:i" }}</td>
+                                            <td>
+                                                <form method="post" action="{% url 'payment:payment_delete' payment.payment_id %}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce paiement ?');">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="invoice_id" value="{{ invoice_id }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="bi bi-trash"></i> Supprimer
+                                                    </button>
+                                                </form>
+                                            </td>
+                                            <td>
+                                                <form method="post" action="{% url 'payment:payment_delete' payment.payment_id %}">
+                                                    {% csrf_token %}
+                                                    <input type="hidden" name="invoice_id" value="{{ invoice_id }}">
+                                                    <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                        <i class="bi bi-trash"></i> Supprimer
+                                                    </button>
+                                                </form>
+                                            </td>
                                         </tr>
                                     {% endfor %}
                                 </tbody>
                             </table>
-                        </div>
-
-                        <div class="mt-4">
-                            <h6>Résumé</h6>
-                            <p><strong>Montant total payé :</strong>
-                                <span class="text-success fw-bold">{{ total_paid|floatformat:2 }}€</span>
-                            </p>
-                            <p><strong>Facture associée :</strong> #{{ invoice.invoice_id }}</p>
                         </div>
                     {% else %}
                         <div class="alert alert-info" role="alert">
@@ -83,6 +94,9 @@
             <form method="post">
                 {% csrf_token %}
                 <div class="modal-body">
+                    <!-- Champ caché pour l'invoice_id -->
+                    <input type="hidden" name="invoice_id" value="{{ invoice_id }}">
+
                     <div class="mb-3">
                         <label for="amount" class="form-label">Montant</label>
                         <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>

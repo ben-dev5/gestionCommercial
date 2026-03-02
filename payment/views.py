@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.views.generic import TemplateView
 
 from payment.services.payment_service import PaymentService
@@ -11,9 +11,107 @@ class PaymentView(TemplateView):
         context = super().get_context_data(**kwargs)
         payment_service = PaymentService()
 
+        # Récupérer invoice_id depuis les paramètres de requête
+        invoice_id = self.request.GET.get('invoice_id')
+
         try:
-            context['payment_service'] = payment_service.get_all_payments()
+            # Affiche seulement les paiements de cette facture spécifique
+            if invoice_id:
+                context['payments'] = payment_service.get_payments_by_invoice_id(invoice_id)
+            else:
+                context['payments'] = None
+            context['invoice_id'] = invoice_id
         except:
-            context['payment_service'] = None
+            context['payments'] = None
+            context['invoice_id'] = invoice_id
 
         return context
+
+    def post(self, request, *args, **kwargs):
+        payment_method = request.POST.get('payment_method')
+        state_payment = request.POST.get('state_payment')
+        invoice_id = request.POST.get('invoice_id')
+        amount = request.POST.get('amount')
+
+        payment_service = PaymentService()
+        try:
+            # Vérifier que tous les champs sont remplis
+            if not all([payment_method, state_payment, invoice_id, amount]):
+                context = self.get_context_data(**kwargs)
+                context['error'] = 'Tous les champs sont obligatoires'
+                return render(request, self.template_name, context)
+
+            # Convertir amount en nombre
+            try:
+                amount = float(amount)
+            except ValueError:
+                context = self.get_context_data(**kwargs)
+                context['error'] = 'Le montant doit être un nombre valide'
+                return render(request, self.template_name, context)
+
+            payment_service.create_payment(payment_method, state_payment, invoice_id, amount)
+            context = self.get_context_data(**kwargs)
+            context['message'] = 'Paiement enregistré avec succès'
+            return render(request, self.template_name, context)
+        except Exception as e:
+            context = self.get_context_data(**kwargs)
+            context['error'] = f'Erreur lors de l\'enregistrement : {str(e)}'
+            return render(request, self.template_name, context)
+
+
+class PaymentDeleteView(TemplateView):
+
+    def post(self, request, payment_id, *args, **kwargs):
+        invoice_id = request.POST.get('invoice_id')
+        payment_service = PaymentService()
+        try:
+            payment_service.delete_payment(payment_id)
+            # Rediriger vers la page de paiement avec l'invoice_id
+            return redirect(f'/payment/?invoice_id={invoice_id}')
+        except Exception as e:
+            return render(request, 'payment/payment.html', {
+                'error': f'Erreur lors de la suppression : {str(e)}',
+                'invoice_id': invoice_id
+            })
+
+
+
+class PaymentUpdateView(TemplateView):
+    template_name = 'payment/payment.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+
+    def post(self, request, payment_id, *args, **kwargs):
+        payment_method = request.POST.get('payment_method')
+        state_payment = request.POST.get('state_payment')
+        invoice_id = request.POST.get('invoice_id')
+        amount = request.POST.get('amount')
+
+        payment_service = PaymentService()
+        try:
+            # Vérifier que tous les champs sont remplis
+            if not all([payment_method, state_payment, invoice_id, amount]):
+                context = self.get_context_data(**kwargs)
+                context['error'] = 'Tous les champs sont obligatoires'
+                return render(request, self.template_name, context)
+
+            # Convertir amount en nombre
+            try:
+                amount = float(amount)
+            except ValueError:
+                context = self.get_context_data(**kwargs)
+                context['error'] = 'Le montant doit être un nombre valide'
+                return render(request, self.template_name, context)
+
+            payment_service.updtate_payment(payment_id, payment_method, state_payment, invoice_id, amount)
+            context = self.get_context_data(**kwargs)
+            context['message'] = 'Paiement mis à jour avec succès'
+            return render(request, self.template_name, context)
+        except Exception as e:
+            context = self.get_context_data(**kwargs)
+            context['error'] = f'Erreur lors de la mise à jour : {str(e)}'
+            return render(request, self.template_name, context)
+
+
