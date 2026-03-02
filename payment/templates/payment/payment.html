@@ -1,0 +1,120 @@
+{% extends "commons/base.html" %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Informations de Paiement</h5>
+                </div>
+                <div class="card-body">
+                    {% if payments %}
+                        <div class="table-responsive">
+                            <table class="table table-striped table-hover">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th>ID Paiement</th>
+                                        <th>Montant</th>
+                                        <th>Méthode</th>
+                                        <th>Status</th>
+                                        <th>Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for payment in payments %}
+                                        <tr>
+                                            <td><strong>#{{ payment.payment_id }}</strong></td>
+                                            <td class="fw-bold text-success">{{ payment.amount|floatformat:2 }}€</td>
+                                            <td>
+                                                <span class="badge bg-info">{{ payment.payment_method }}</span>
+                                            </td>
+                                            <td>
+                                                {% if payment.state_payment == 'Payé' %}
+                                                    <span class="badge bg-success">{{ payment.state_payment }}</span>
+                                                {% elif payment.state_payment == 'En cours' %}
+                                                    <span class="badge bg-warning">{{ payment.state_payment }}</span>
+                                                {% else %}
+                                                    <span class="badge bg-secondary">{{ payment.state_payment }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>{{ payment.created_at|date:"d/m/Y H:i" }}</td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div class="mt-4">
+                            <h6>Résumé</h6>
+                            <p><strong>Montant total payé :</strong>
+                                <span class="text-success fw-bold">{{ total_paid|floatformat:2 }}€</span>
+                            </p>
+                            <p><strong>Facture associée :</strong> #{{ invoice.invoice_id }}</p>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info" role="alert">
+                            <i class="bi bi-info-circle"></i> Aucun paiement enregistré pour cette facture.
+                        </div>
+                    {% endif %}
+
+                    <div class="d-flex gap-2 mt-4">
+                        <a href="{% url 'invoicing:invoice_list' %}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour
+                        </a>
+                        <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#addPaymentModal">
+                            <i class="bi bi-plus-circle"></i> Ajouter un paiement
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal ajout paiement -->
+<div class="modal fade" id="addPaymentModal" tabindex="-1" aria-labelledby="addPaymentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-secondary text-white">
+                <h5 class="modal-title" id="addPaymentModalLabel">Ajouter un Paiement</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="amount" class="form-label">Montant</label>
+                        <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="payment_method" class="form-label">Méthode de paiement</label>
+                        <select class="form-select" id="payment_method" name="payment_method" required>
+                            <option value="">Sélectionner une méthode</option>
+                            <option value="Carte bancaire">Carte bancaire</option>
+                            <option value="PayPal">PayPal</option>
+                            <option value="Virement bancaire">Virement bancaire</option>
+                            <option value="Chèque">Chèque</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="state_payment" class="form-label">Status</label>
+                        <select class="form-select" id="state_payment" name="state_payment" required>
+                            <option value="">Sélectionner un status</option>
+                            <option value="En attente">En attente</option>
+                            <option value="En cours">En cours</option>
+                            <option value="Payé">Payé</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle"></i> Enregistrer
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
