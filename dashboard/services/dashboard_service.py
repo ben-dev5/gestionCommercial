@@ -1,7 +1,6 @@
-from datetime import datetime, timedelta
+from datetime import datetime
 from decimal import Decimal
 
-from django.core.cache import cache
 
 from sales.services.sales_order_service import SalesOrderService
 from sales.services.sales_order_line_service import SalesOrderLineService
