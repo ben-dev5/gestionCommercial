@@ -5,6 +5,7 @@ from datetime import date
 from invoicing.services.invoice_service import InvoiceService
 from invoicing.services.invoice_order_line_service import InvoiceOrderLineService
 from commons.services.contact_service import ContactService
+from commons.dtos import CreateContactDTO
 from products.services.product_service import ProductService
 
 
@@ -15,9 +16,8 @@ class InvoiceTest(TestCase):
         self.invoice_service = InvoiceService()
         self.contact_service = ContactService()
 
-        # Créer un contact de test
-        self.contact = self.contact_service.create_contact(
-            contact_id=None,
+        # Créer un contact de test avec DTO
+        contact_dto = CreateContactDTO(
             first_name="Client",
             last_name="Test",
             address="123 Rue Test",
@@ -29,6 +29,7 @@ class InvoiceTest(TestCase):
             phone="0123456789",
             type="client"
         )
+        self.contact = self.contact_service.create_contact(contact_dto)
 
     def test_invoice_creation(self):
         """Test la création d'une facture"""
@@ -262,9 +263,8 @@ class InvoiceOrderLineTest(TestCase):
         self.product_service = ProductService()
         self.invoice_order_line_service = InvoiceOrderLineService()
 
-        # Créer un contact
-        self.contact = self.contact_service.create_contact(
-            contact_id=None,
+        # Créer un contact avec DTO
+        contact_dto = CreateContactDTO(
             first_name="Client",
             last_name="Test",
             address="123 Rue Test",
@@ -276,6 +276,7 @@ class InvoiceOrderLineTest(TestCase):
             phone="0123456789",
             type="client"
         )
+        self.contact = self.contact_service.create_contact(contact_dto)
 
         # Créer une facture
         self.invoice = self.invoice_service.create_invoice(

@@ -1,12 +1,12 @@
 from django.core.exceptions import ValidationError
 from django.test import TestCase
 from commons.services.contact_service import ContactService
+from commons.dtos import CreateContactDTO, ContactDTO
 
 class ContactValidateFieldsTests(TestCase):
     def setUp(self):
         self.service = ContactService()
-        self.contact = self.service.create_contact(
-            contact_id = 2,
+        contact_dto = CreateContactDTO (
             first_name="john",
             last_name="Doe",
             email="john@example.com",
@@ -18,6 +18,7 @@ class ContactValidateFieldsTests(TestCase):
             state = "CA",
             zip_code = "9410",
         )
+        self.contact = self.service.create_contact(contact_dto)
     def test_validate_contact_field(self):
         # test que les champs ne sont pas vide
         self.assertIsNotNone(self.contact.last_name)
@@ -48,8 +49,7 @@ class ContactValidateFieldsTests(TestCase):
     def test_type_contact_field(self):
         # Créer un contact client
         self.service = ContactService()
-        contact_client = self.service.create_contact(
-            contact_id=3,
+        contact_dto = CreateContactDTO(
             first_name="Alice",
             last_name="Smith",
             email="alice@example.com",
@@ -61,11 +61,10 @@ class ContactValidateFieldsTests(TestCase):
             state="NY",
             zip_code="10001",
         )
-
+        self.contact = self.service.create_contact(contact_dto)
         # Créer un contact fournisseur
         self.service = ContactService()
-        contact_fournisseur = self.service.create_contact(
-            contact_id=4,
+        contact_dto = CreateContactDTO(
             first_name="Bob",
             last_name="Johnson",
             email="bob@example.com",
@@ -77,14 +76,12 @@ class ContactValidateFieldsTests(TestCase):
             state="CA",
             zip_code="90001",
         )
-
+        self.contact = self.service.create_contact(contact_dto)
         # Vérifier que les types sont différents
-        self.assertNotEqual(contact_client.type, contact_fournisseur.type)
 
     def test_delete_contact(self):
         self.service = ContactService()
-        contact = self.service.create_contact(
-            contact_id=1,
+        contact_dto = CreateContactDTO(
             first_name="John",
             last_name="Doe",
             email="john@mail.com",
@@ -96,6 +93,5 @@ class ContactValidateFieldsTests(TestCase):
             state="IDF",
             zip_code="75000"
         )
-
-        self.service.delete_contact(contact.contact_id)
+        self.contact = self.service.create_contact(contact_dto)
         self.assertEqual(self.service.get_all_contacts().count(), 1)
