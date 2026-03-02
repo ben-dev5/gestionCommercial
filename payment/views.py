@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse
 from django.views.generic import TemplateView
 
 from payment.services.payment_service import PaymentService
@@ -67,7 +68,7 @@ class PaymentDeleteView(TemplateView):
         try:
             payment_service.delete_payment(payment_id)
             # Rediriger vers la page de paiement avec l'invoice_id
-            return redirect(f'/payment/?invoice_id={invoice_id}')
+            return redirect(f"{reverse('payment:payment')}?invoice_id={invoice_id}")
         except Exception as e:
             return render(request, 'payment/payment.html', {
                 'error': f'Erreur lors de la suppression : {str(e)}',
@@ -79,9 +80,20 @@ class PaymentDeleteView(TemplateView):
 class PaymentUpdateView(TemplateView):
     template_name = 'payment/payment.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, payment_id, **kwargs):
         context = super().get_context_data(**kwargs)
+        payment_service = PaymentService()
 
+        try:
+            payment = payment_service.get_payment_by_id(payment_id)
+            context['payment'] = payment
+            context['invoice_id'] = payment.invoice_id.invoice_id
+        except Exception as e:
+            context['payment'] = None
+            context['invoice_id'] = None
+            context['error'] = f'Erreur lors de la récupération du paiement : {str(e)}'
+
+        return context
 
     def post(self, request, payment_id, *args, **kwargs):
         payment_method = request.POST.get('payment_method')
@@ -93,7 +105,7 @@ class PaymentUpdateView(TemplateView):
         try:
             # Vérifier que tous les champs sont remplis
             if not all([payment_method, state_payment, invoice_id, amount]):
-                context = self.get_context_data(**kwargs)
+                context = self.get_context_data(payment_id)
                 context['error'] = 'Tous les champs sont obligatoires'
                 return render(request, self.template_name, context)
 
@@ -101,16 +113,15 @@ class PaymentUpdateView(TemplateView):
             try:
                 amount = float(amount)
             except ValueError:
-                context = self.get_context_data(**kwargs)
+                context = self.get_context_data(payment_id)
                 context['error'] = 'Le montant doit être un nombre valide'
                 return render(request, self.template_name, context)
 
-            payment_service.updtate_payment(payment_id, payment_method, state_payment, invoice_id, amount)
-            context = self.get_context_data(**kwargs)
-            context['message'] = 'Paiement mis à jour avec succès'
-            return render(request, self.template_name, context)
+            payment_service.update_payment(payment_id, payment_method, state_payment, invoice_id, amount)
+            # Rediriger vers la page de paiement avec l'invoice_id
+            return redirect(f"{reverse('payment:payment')}?invoice_id={invoice_id}")
         except Exception as e:
-            context = self.get_context_data(**kwargs)
+            context = self.get_context_data(payment_id)
             context['error'] = f'Erreur lors de la mise à jour : {str(e)}'
             return render(request, self.template_name, context)
 

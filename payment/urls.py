@@ -8,3 +8,4 @@ urlpatterns = [
     path('<int:payment_id>/delete/', PaymentDeleteView.as_view(), name='payment_delete'),
     path('<int:payment_id>/update/', PaymentUpdateView.as_view(), name='payment_update'),
 ]
+

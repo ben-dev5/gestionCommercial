@@ -17,7 +17,7 @@ class PaymentService:
     def get_all_payments(self):
         return self.repo.get_all_payments()
 
-    def updtate_payment(self, payment_id, payment_method, state_payment, invoice_id, amount):
+    def update_payment(self, payment_id, payment_method, state_payment, invoice_id, amount):
         return self.repo.update_payment(payment_id, payment_method, state_payment, invoice_id, amount)
 
     def delete_payment(self, payment_id):
