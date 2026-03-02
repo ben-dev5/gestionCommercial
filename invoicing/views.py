@@ -3,7 +3,7 @@ from datetime import datetime
 
 from invoicing.services.invoice_service import InvoiceService
 from invoicing.services.invoice_order_line_service import InvoiceOrderLineService
-from invoicing.forms import InvoiceStatusForm, InvoiceDateForm
+from invoicing.forms import  InvoiceDateForm
 from sales.services.sales_order_service import SalesOrderService
 from sales.services.sales_order_line_service import SalesOrderLineService
 from django.http import FileResponse
@@ -16,7 +16,6 @@ from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.contrib import messages
 from django.views.generic import TemplateView
-
 
 
 class InvoiceListView(TemplateView):
@@ -56,7 +55,6 @@ class InvoiceDetailView(TemplateView):
             context['invoice'] = invoice
             context['lines'] = lines
             context['has_lines'] = len(lines) > 0
-            context['status_form'] = InvoiceStatusForm(initial={'status': invoice.status})
             context['date_form'] = InvoiceDateForm(initial={'created_at': invoice.created_at})
         except:
             raise Http404("Facture non trouvée")
@@ -70,29 +68,8 @@ class InvoiceDetailView(TemplateView):
         try:
             invoice = invoice_service.get_invoice_by_id(pk)
 
-            # Vérifier quel formulaire a été soumis
-            if 'status' in request.POST:
-                form = InvoiceStatusForm(request.POST)
-                if form.is_valid():
-                    new_status = form.cleaned_data['status']
-                    invoice_service.update_invoice(
-                        invoice_id=pk,
-                        contact_id=invoice.contact_id.contact_id,
-                        name=invoice.name,
-                        address=invoice.address,
-                        city=invoice.city,
-                        state=invoice.state,
-                        zip_code=invoice.zip_code,
-                        siret=invoice.siret,
-                        email=invoice.email,
-                        phone=invoice.phone,
-                        status=new_status
-                    )
-                    messages.success(request, f"Statut mis à jour : {new_status}")
-                else:
-                    messages.error(request, "Erreur lors de la mise à jour du statut")
 
-            elif 'created_at' in request.POST:
+            if 'created_at' in request.POST:
                 form = InvoiceDateForm(request.POST)
                 if form.is_valid():
                     new_date = form.cleaned_data['created_at']
@@ -107,7 +84,6 @@ class InvoiceDetailView(TemplateView):
                         siret=invoice.siret,
                         email=invoice.email,
                         phone=invoice.phone,
-                        status=invoice.status,
                         created_at=new_date
                     )
                     messages.success(request, "Date mise à jour")

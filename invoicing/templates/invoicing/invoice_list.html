@@ -29,7 +29,6 @@
                             <th>Numéro</th>
                             <th>Contact</th>
                             <th>Email</th>
-                            <th>Statut</th>
                             <th>Actions</th>
                         </tr>
                     </thead>
@@ -39,13 +38,6 @@
                                 <td>#{{ invoice.invoice_id }}</td>
                                 <td>{{ invoice.contact_id.first_name }} {{ invoice.contact_id.last_name }}</td>
                                 <td>{{ invoice.email }}</td>
-                                <td>
-                                    {% if invoice.status == 'réglé' %}
-                                        <span class="badge bg-success">Réglé</span>
-                                    {% else %}
-                                        <span class="badge bg-warning">En attente</span>
-                                    {% endif %}
-                                </td>
                                 <td>
                                     <div class="btn-group" role="group">
                                         <a href="{% url 'invoicing:invoice_detail' invoice.invoice_id %}" class="btn btn-sm btn-outline-primary">
