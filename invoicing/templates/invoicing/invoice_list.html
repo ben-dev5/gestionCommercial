@@ -40,10 +40,14 @@
                                 <td>{{ invoice.contact_id.first_name }} {{ invoice.contact_id.last_name }}</td>
                                 <td>{{ invoice.email }}</td>
                                 <td>
-                                    {% if invoice.status == 'réglé' %}
-                                        <span class="badge bg-success">Réglé</span>
-                                    {% else %}
-                                        <span class="badge bg-warning">En attente</span>
+                                    {% if invoice.status == 'Brouillon' %}
+                                        <span class="badge bg-warning">Brouillon</span>
+                                    {% elif invoice.status == 'Confirmé' %}
+                                        <span class="badge bg-success">Confirmé</span>
+                                    {% elif invoice.status == 'Comptabilisé' %}
+                                        <span class="badge bg-success">Comptabilisé</span>
+                                    {% elif invoice.status == 'Annulée' %}
+                                        <span class="badge bg-danger">Annulée</span>
                                     {% endif %}
                                 </td>
                                 <td>

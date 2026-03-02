@@ -5,8 +5,10 @@ from commons.models.contact_models import Contact
 
 
 STATUS_CHOICES = (
-    ('En attente', 'En attente'),
-    ('réglé', 'Réglé'),
+    ('Brouillon', 'Brouillon'),
+    ('Confirmé', 'Confirmé'),
+    ('Comptabilisé', 'Comptabilisé'),
+    ('Annulée', 'Annulée'),
 )
 
 
@@ -25,7 +27,7 @@ class Invoice(models.Model):
     description_products = models.TextField()
     price_ht = models.IntegerField()
     tax = models.IntegerField()
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='En attente')
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='Brouillon')
     # rendre la date non automatique pour pouvoir la renseigner lors de la création d'une facture à partir d'un devis
     created_at = models.DateTimeField(auto_now_add=False, null=False, default=timezone.now)
 
