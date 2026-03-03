@@ -112,9 +112,9 @@
                                 <td>{{ line.amount_remaining|floatformat:2 }}€</td>
                                 <td>
                                     {% if line.amount_remaining <= 0 %}
-                                        <span class="badge bg-success">Payée</span>
+                                        <span class="badge bg-success">Réglé</span>
                                     {% else %}
-                                        <span class="badge bg-warning">Partiellement payée</span>
+                                        <span class="badge bg-warning">Non réglé</span>
                                     {% endif %}
                                 </td>
                             </tr>
