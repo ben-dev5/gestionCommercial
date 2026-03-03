@@ -3,7 +3,6 @@ from django.utils import timezone
 
 from commons.models.contact_models import Contact
 
-
 STATUS_CHOICES = (
     ('Brouillon', 'Brouillon'),
     ('Confirmé', 'Confirmé'),
@@ -31,3 +30,18 @@ class Invoice(models.Model):
     # rendre la date non automatique pour pouvoir la renseigner lors de la création d'une facture à partir d'un devis
     created_at = models.DateTimeField(auto_now_add=False, null=False, default=timezone.now)
 
+    @property
+    def total_amount(self):
+        return self.price_ht + (self.price_ht * self.tax / 100)
+
+    @property
+    def total_paid(self):
+        return sum(payment.amount for payment in self.payments.all())
+
+    @property
+    def remaining_amount(self):
+        return self.total_amount - self.total_paid
+
+    @property
+    def is_paid(self):
+        return self.remaining_amount <= 0

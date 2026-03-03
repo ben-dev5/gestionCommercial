@@ -48,12 +48,20 @@ class InvoiceDetailView(TemplateView):
             invoice = invoice_service.get_invoice_by_id(pk)
             lines = invoice_line_service.get_invoice_order_lines_by_invoice(pk)
 
-            # Ajouter le total HT calculé pour chaque ligne
+            # Récupération des paiements
+            payments = invoice.payments.all() if hasattr(invoice, 'payments') else []
+            total_paid = sum(p.amount for p in payments) if payments else 0
+
+            # Ajouter le total HT calculé pour chaque ligne et infos paiements
             for line in lines:
                 line.total_ht = line.price_ht * line.quantity
+                line.amount_paid = total_paid
+                line.amount_remaining = line.price_tax - total_paid
 
             context['invoice'] = invoice
             context['lines'] = lines
+            context['payments'] = payments
+            context['total_paid'] = total_paid
             context['has_lines'] = len(lines) > 0
             context['date_form'] = InvoiceDateForm(initial={'created_at': invoice.created_at})
         except:

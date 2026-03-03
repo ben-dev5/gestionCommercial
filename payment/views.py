@@ -103,13 +103,13 @@ class PaymentUpdateView(TemplateView):
 
         payment_service = PaymentService()
         try:
-            # Vérifier que tous les champs sont remplis
+            # Vérifier champs remplis
             if not all([payment_method, state_payment, invoice_id, amount]):
                 context = self.get_context_data(payment_id)
                 context['error'] = 'Tous les champs sont obligatoires'
                 return render(request, self.template_name, context)
 
-            # Convertir amount en nombre
+            # Convertir amount
             try:
                 amount = float(amount)
             except ValueError:
@@ -118,11 +118,10 @@ class PaymentUpdateView(TemplateView):
                 return render(request, self.template_name, context)
 
             payment_service.update_payment(payment_id, payment_method, state_payment, invoice_id, amount)
-            # Rediriger vers la page de paiement avec l'invoice_id
+            # Rediriger vers page des paiements de la facture
             return redirect(f"{reverse('payment:payment')}?invoice_id={invoice_id}")
         except Exception as e:
             context = self.get_context_data(payment_id)
             context['error'] = f'Erreur lors de la mise à jour : {str(e)}'
             return render(request, self.template_name, context)
-
 

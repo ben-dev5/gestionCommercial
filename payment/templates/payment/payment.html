@@ -50,7 +50,7 @@
                                                 </form>
                                             </td>
                                             <td>
-                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#updatePaymentModal{{ payment.payment_id }}" onclick="setUpdateFormAction('{% url 'payment:payment_update' payment.payment_id %}')">
+                                                <button type="button" class="btn btn-sm btn-outline-primary" data-bs-toggle="modal" data-bs-target="#updatePaymentModal{{ payment.payment_id }}">
                                                     <i class="bi bi-pencil"></i> Modifier
                                                 </button>
                                             </td>
@@ -127,8 +127,7 @@
         </div>
     </div>
 </div>
-
-<!-- Modal mise à jour paiement -->
+<!-- Modal mise a jour du paiement -->
 {% if payments %}
     {% for payment in payments %}
     <div class="modal fade" id="updatePaymentModal{{ payment.payment_id }}" tabindex="-1" aria-labelledby="updatePaymentModalLabel{{ payment.payment_id }}" aria-hidden="true">

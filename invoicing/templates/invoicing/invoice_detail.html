@@ -93,6 +93,9 @@
                             <th>Taxe</th>
                             <th>Total HT</th>
                             <th>Total TTC</th>
+                            <th>Montant réglé</th>
+                            <th>Reste a réglé</th>
+                            <th>Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -105,6 +108,15 @@
                                 <td>{{ line.tax|floatformat:2 }}%</td>
                                 <td>{{ line.total_ht|floatformat:2 }}€</td>
                                 <td class="fw-bold text-success">{{ line.price_tax|floatformat:2 }}€</td>
+                                <td>{{ line.amount_paid|floatformat:2 }}€</td>
+                                <td>{{ line.amount_remaining|floatformat:2 }}€</td>
+                                <td>
+                                    {% if line.amount_remaining <= 0 %}
+                                        <span class="badge bg-success">Payée</span>
+                                    {% else %}
+                                        <span class="badge bg-warning">Partiellement payée</span>
+                                    {% endif %}
+                                </td>
                             </tr>
                         {% endfor %}
                     </tbody>
