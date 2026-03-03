@@ -14,6 +14,26 @@
     </div>
     {% endif %}
 
+    <!-- Boutons de switch d'affichage en fonction de l'État de paiement  -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <input type="radio" class="btn-check" name="switch" id="btn1" checked onclick="showView('view1')">
+                        <label class="btn btn-outline-secondary" for="btn1">Payé</label>
+
+                        <input type="radio" class="btn-check" name="switch" id="btn2" onclick="showView('view2')">
+                        <label class="btn btn-outline-secondary" for="btn2">En attente</label>
+
+                        <input type="radio" class="btn-check" name="switch" id="btn3" onclick="showView('view3')">
+                        <label class="btn btn-outline-secondary" for="btn3">En cours</label>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <!-- Chiffre d'affaires du mois -->
     <div class="row mb-4">
         <div class="col-md-12">
