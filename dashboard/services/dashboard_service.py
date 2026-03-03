@@ -6,45 +6,42 @@ from sales.services.sales_order_service import SalesOrderService
 from sales.services.sales_order_line_service import SalesOrderLineService
 from invoicing.services.invoice_service import InvoiceService
 from invoicing.services.invoice_order_line_service import InvoiceOrderLineService
+from payment.services.payment_service import PaymentService
 from commons.services.contact_service import ContactService
 
 
 class DashboardService:
-    """Service pour dashboard"""
+
 
     def __init__(self):
         self.sales_order_service = SalesOrderService()
         self.sales_order_line_service = SalesOrderLineService()
         self.invoice_service = InvoiceService()
         self.invoice_order_line_service = InvoiceOrderLineService()
+        self.payment_service = PaymentService()
         self.contact_service = ContactService()
 
     def get_monthly_revenue(self):
-        """Retourne le chiffre d'affaires du mois courant (factures existantes uniquement et réglées)"""
-        invoices = self.invoice_service.get_all_invoices()
+
+        # En prenant en compte les status de paiements avec filtre sur le mois courant
+        payments = self.payment_service.get_all_payments()
 
         today = datetime.now()
         current_month = today.month
         current_year = today.year
 
         total_revenue = Decimal('0.00')
-        for invoice in invoices:
-            # Vérifier que la facture est réglée et du mois courant
-            if invoice.status == 'réglé' and hasattr(invoice, 'created_at') and invoice.created_at:
-                invoice_date = invoice.created_at if isinstance(invoice.created_at, datetime) else datetime.fromisoformat(str(invoice.created_at))
-                if invoice_date.month == current_month and invoice_date.year == current_year:
-                    try:
-                        lines = self.invoice_order_line_service.get_invoice_order_lines_by_invoice(invoice.invoice_id)
-                        for line in lines:
-                            total_revenue += Decimal(str(line.price_tax))
-                    except:
-                        pass
+        for payment in payments:
+            # Vérifier que le paiement est "Payé" et du mois courant
+            if payment.state_payment == 'Payé' and hasattr(payment, 'created_at') and payment.created_at:
+                payment_date = payment.created_at if isinstance(payment.created_at, datetime) else datetime.fromisoformat(str(payment.created_at))
+                if payment_date.month == current_month and payment_date.year == current_year:
+                    total_revenue += Decimal(str(payment.amount))
 
         return float(total_revenue)
 
     def get_sales_evolution(self):
-        """Retourne l'évolution des ventes sur 6 mois (factures existantes uniquement et réglées)"""
-        invoices = self.invoice_service.get_all_invoices()
+        payments = self.payment_service.get_all_payments()
 
         evolution_data = {}
         today = datetime.now()
@@ -72,33 +69,28 @@ class DashboardService:
                 'revenue': Decimal('0.00')
             }
 
-        # Remplir avec les factures existantes et réglées
-        for invoice in invoices:
-            if invoice.status == 'réglé' and hasattr(invoice, 'created_at') and invoice.created_at:
-                invoice_date = invoice.created_at if isinstance(invoice.created_at, datetime) else datetime.fromisoformat(str(invoice.created_at))
-                month_label = invoice_date.strftime('%b %Y')
+        # Remplir avec les paiements réglés
+        for payment in payments:
+            if payment.state_payment == 'Payé' and hasattr(payment, 'created_at') and payment.created_at:
+                payment_date = payment.created_at if isinstance(payment.created_at, datetime) else datetime.fromisoformat(str(payment.created_at))
+                month_label = payment_date.strftime('%b %Y')
 
                 if month_label in evolution_data:
-                    try:
-                        lines = self.invoice_order_line_service.get_invoice_order_lines_by_invoice(invoice.invoice_id)
-                        for line in lines:
-                            evolution_data[month_label]['revenue'] += Decimal(str(line.price_tax))
-                    except:
-                        pass
+                    evolution_data[month_label]['revenue'] += Decimal(str(payment.amount))
 
         # Retourner au format dictionnaire simple {mois: revenue}
         return {k: float(v['revenue']) for k, v in evolution_data.items()}
 
     def get_top_5_clients(self):
-        """Retourne les 5 clients avec le plus gros CA (factures existantes uniquement et réglées)"""
-        invoices = self.invoice_service.get_all_invoices()
+        payments = self.payment_service.get_all_payments()
 
         client_revenue = {}
 
-        for invoice in invoices:
-            # Vérifier que la facture est réglée
-            if invoice.status == 'réglé':
+        for payment in payments:
+            # Vérifier que le paiement est "Payé"
+            if payment.state_payment == 'Payé':
                 try:
+                    invoice = payment.invoice_id
                     contact_id = invoice.contact_id.contact_id
                     contact = self.contact_service.get_contact_by_id(contact_id)
 
@@ -108,9 +100,7 @@ class DashboardService:
                             'revenue': Decimal('0.00')
                         }
 
-                    lines = self.invoice_order_line_service.get_invoice_order_lines_by_invoice(invoice.invoice_id)
-                    for line in lines:
-                        client_revenue[contact_id]['revenue'] += Decimal(str(line.price_tax))
+                    client_revenue[contact_id]['revenue'] += Decimal(str(payment.amount))
                 except:
                     pass
 
@@ -130,7 +120,6 @@ class DashboardService:
         ]
 
     def get_unconverted_quotes(self):
-        """Retourne les devis non transformés en commandes/factures"""
         sales_orders = self.sales_order_service.get_all_sales_orders()
         invoices = self.invoice_service.get_all_invoices()
 
