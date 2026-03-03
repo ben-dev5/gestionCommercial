@@ -21,8 +21,8 @@ class DashboardService:
         self.payment_service = PaymentService()
         self.contact_service = ContactService()
 
-    def get_monthly_revenue(self):
-
+    def get_monthly_revenue(self, payment_status='Payé'):
+        """Retourne le CA du mois courant filtré par statut de paiement"""
         # En prenant en compte les status de paiements avec filtre sur le mois courant
         payments = self.payment_service.get_all_payments()
 
@@ -32,15 +32,15 @@ class DashboardService:
 
         total_revenue = Decimal('0.00')
         for payment in payments:
-            # Vérifier que le paiement est "Payé" et du mois courant
-            if payment.state_payment == 'Payé' and hasattr(payment, 'created_at') and payment.created_at:
+            # Vérifier que le paiement a le statut demandé et du mois courant
+            if payment.state_payment == payment_status and hasattr(payment, 'created_at') and payment.created_at:
                 payment_date = payment.created_at if isinstance(payment.created_at, datetime) else datetime.fromisoformat(str(payment.created_at))
                 if payment_date.month == current_month and payment_date.year == current_year:
                     total_revenue += Decimal(str(payment.amount))
 
         return float(total_revenue)
 
-    def get_sales_evolution(self):
+    def get_sales_evolution(self, payment_status='Payé'):
         payments = self.payment_service.get_all_payments()
 
         evolution_data = {}
@@ -69,9 +69,9 @@ class DashboardService:
                 'revenue': Decimal('0.00')
             }
 
-        # Remplir avec les paiements réglés
+        # Remplir avec les paiements du statut demandé
         for payment in payments:
-            if payment.state_payment == 'Payé' and hasattr(payment, 'created_at') and payment.created_at:
+            if payment.state_payment == payment_status and hasattr(payment, 'created_at') and payment.created_at:
                 payment_date = payment.created_at if isinstance(payment.created_at, datetime) else datetime.fromisoformat(str(payment.created_at))
                 month_label = payment_date.strftime('%b %Y')
 
@@ -81,14 +81,14 @@ class DashboardService:
         # Retourner au format dictionnaire simple {mois: revenue}
         return {k: float(v['revenue']) for k, v in evolution_data.items()}
 
-    def get_top_5_clients(self):
+    def get_top_5_clients(self, payment_status='Payé'):
         payments = self.payment_service.get_all_payments()
 
         client_revenue = {}
 
         for payment in payments:
-            # Vérifier que le paiement est "Payé"
-            if payment.state_payment == 'Payé':
+            # Vérifier que le paiement a le statut demandé
+            if payment.state_payment == payment_status:
                 try:
                     invoice = payment.invoice_id
                     contact_id = invoice.contact_id.contact_id
@@ -147,10 +147,10 @@ class DashboardService:
 
         return unconverted_quotes
 
-    def get_dashboard_stats(self):
+    def get_dashboard_stats(self, payment_status='Payé'):
         return {
-            'monthly_revenue': self.get_monthly_revenue(),
-            'sales_evolution': self.get_sales_evolution(),
-            'top_5_clients': self.get_top_5_clients(),
+            'monthly_revenue': self.get_monthly_revenue(payment_status),
+            'sales_evolution': self.get_sales_evolution(payment_status),
+            'top_5_clients': self.get_top_5_clients(payment_status),
             'unconverted_quotes': self.get_unconverted_quotes(),
         }

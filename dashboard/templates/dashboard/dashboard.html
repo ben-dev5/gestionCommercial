@@ -20,14 +20,14 @@
             <div class="card">
                 <div class="card-body">
                     <div class="row align-items-center">
-                        <input type="radio" class="btn-check" name="switch" id="btn1" checked onclick="showView('view1')">
-                        <label class="btn btn-outline-secondary" for="btn1">Payé</label>
+                        <input type="radio" class="btn-check" name="payment_status" id="status_paid" value="Payé" checked>
+                        <label class="btn btn-outline-success" for="status_paid"><i class="bi bi-check-circle"></i> Payé</label>
 
-                        <input type="radio" class="btn-check" name="switch" id="btn2" onclick="showView('view2')">
-                        <label class="btn btn-outline-secondary" for="btn2">En attente</label>
+                        <input type="radio" class="btn-check" name="payment_status" id="status_pending" value="En attente">
+                        <label class="btn btn-outline-danger" for="status_pending"><i class="bi bi-hourglass-split"></i> En attente</label>
 
-                        <input type="radio" class="btn-check" name="switch" id="btn3" onclick="showView('view3')">
-                        <label class="btn btn-outline-secondary" for="btn3">En cours</label>
+                        <input type="radio" class="btn-check" name="payment_status" id="status_in_progress" value="En cours ">
+                        <label class="btn btn-outline-warning" for="status_in_progress"><i class="bi bi-clock"></i> En cours</label>
 
                     </div>
                 </div>
@@ -45,7 +45,7 @@
                             <p class="text-muted">Revenus générés ce mois</p>
                         </div>
                         <div class="col-md-4 text-end">
-                            <h2 class="text-success">{{ monthly_revenue|floatformat:2 }}€</h2>
+                            <h2 class="text-success" id="monthly-revenue-value">{{ monthly_revenue|floatformat:2 }}€</h2>
                         </div>
                     </div>
                 </div>
@@ -78,7 +78,7 @@
                 </div>
                 <div class="card-body">
                     {% if top_5_clients %}
-                    <div class="list-group">
+                    <div class="list-group" id="top-5-clients-list">
                         {% for client in top_5_clients %}
                         <a href="{% url 'commons:contact_detail' client.contact_id %}" class="list-group-item list-group-item-action">
                             <div class="d-flex w-100 justify-content-between">
@@ -145,11 +145,10 @@
         // Récupérer les données de sales_evolution depuis Django
         const salesEvolutionData = JSON.parse('{{ sales_evolution|safe }}');
         console.log('Données sales_evolution:', salesEvolutionData);
-        console.log('Type de salesEvolutionData:', typeof salesEvolutionData);
 
         // Préparer les labels et les données pour le graphique
-        const labels = Object.keys(salesEvolutionData);
-        const revenues = Object.values(salesEvolutionData);
+        let labels = Object.keys(salesEvolutionData);
+        let revenues = Object.values(salesEvolutionData);
         console.log('Labels:', labels);
         console.log('Revenues:', revenues);
 
@@ -157,12 +156,14 @@
         const canvas = document.getElementById('salesEvolutionChart');
         console.log('Canvas trouvé:', canvas);
 
+        let chartInstance = null;
+
         if (canvas) {
             // Initialiser le graphique Chart.js
             const ctx = canvas.getContext('2d');
             console.log('Contexte 2D obtenu:', ctx);
 
-            new Chart(ctx, {
+            chartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: labels,
@@ -197,6 +198,69 @@
             console.log('Graphique créé avec succès');
         } else {
             console.error('Canvas #salesEvolutionChart non trouvé');
+        }
+
+        // Gestion du filtre de statut de paiement
+        const paymentStatusRadios = document.querySelectorAll('input[name="payment_status"]');
+
+        paymentStatusRadios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                const selectedStatus = this.value;
+                console.log('Statut sélectionné:', selectedStatus);
+
+                // Faire une requête AJAX à la vue pour récupérer les données filtrées
+                fetch('{% url "dashboard:dashboard" %}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]')?.value || ''
+                    },
+                    body: new URLSearchParams({
+                        'payment_status': selectedStatus
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Données reçues:', data);
+
+                    // Mettre à jour le CA du mois
+                    document.getElementById('monthly-revenue-value').textContent = data.monthly_revenue.toFixed(2) + '€';
+
+                    // Mettre à jour le graphique
+                    if (chartInstance) {
+                        const newLabels = Object.keys(data.sales_evolution);
+                        const newRevenues = Object.values(data.sales_evolution);
+                        chartInstance.data.labels = newLabels;
+                        chartInstance.data.datasets[0].data = newRevenues;
+                        chartInstance.update();
+                    }
+
+                    // Mettre à jour le top 5 clients
+                    updateTop5Clients(data.top_5_clients);
+                })
+                .catch(error => {
+                    console.error('Erreur lors de la récupération des données:', error);
+                });
+            });
+        });
+
+        // Fonction pour mettre à jour le top 5 clients
+        function updateTop5Clients(clients) {
+            const clientsList = document.getElementById('top-5-clients-list');
+            if (clientsList) {
+                if (clients.length > 0) {
+                    clientsList.innerHTML = clients.map(client => `
+                        <a href="/commons/contact/${client.contact_id}/" class="list-group-item list-group-item-action">
+                            <div class="d-flex w-100 justify-content-between">
+                                <h6 class="mb-1">${client.name}</h6>
+                                <span class="badge bg-success">${client.revenue.toFixed(2)}€</span>
+                            </div>
+                        </a>
+                    `).join('');
+                } else {
+                    clientsList.innerHTML = '<div class="alert alert-info mb-0">Aucun client pour le moment</div>';
+                }
+            }
         }
     });
 </script>
