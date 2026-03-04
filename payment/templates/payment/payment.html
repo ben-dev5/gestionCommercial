@@ -87,6 +87,8 @@
                 <h5 class="modal-title" id="addPaymentModalLabel">Ajouter un Paiement</h5>
                 <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+            <!-- Le formulaire s'affiche que si le status n'est pas brouillon ou annulée -->
+            {% if invoice.status != 'Brouillon' and invoice.status != 'Annulée' %}
             <form method="post">
                 {% csrf_token %}
                 <div class="modal-body">
@@ -124,9 +126,15 @@
                     </button>
                 </div>
             </form>
+                {% else %}
+                    <div class="modal-body">
+                        <div class="alert alert-warning" role="alert">
+                            <i class="bi bi-exclamation-triangle"></i> Impossible d'ajouter un paiement tant que la facture est au statut "Brouillon" ou "Annulée". Veuillez d'abord valider la facture.
+                        </div>
+                    </div>
+            {% endif %}
         </div>
     </div>
-</div>
 <!-- Modal mise a jour du paiement -->
 {% if payments %}
     {% for payment in payments %}

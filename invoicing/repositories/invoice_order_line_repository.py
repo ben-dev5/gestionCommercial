@@ -10,7 +10,7 @@ class InvoiceOrderLineRepository:
         line = InvoiceOrderLine.objects.create(
             invoice_id=invoice,
             product_id=product,
-            contact_id=contact,
+            contact_id_id=contact,
             price_ht=price_ht,
             tax=tax,
             price_tax=price_tax,
@@ -39,7 +39,7 @@ class InvoiceOrderLineRepository:
         line = self.get_invoice_order_line_by_id(line_id)
         line.invoice_id = invoice
         line.product_id = product
-        line.contact_id = contact
+        line.contact_id_id = contact
         line.price_ht = price_ht
         line.tax = tax
         line.price_tax = price_tax

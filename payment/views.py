@@ -19,11 +19,15 @@ class PaymentView(TemplateView):
             # Affiche seulement les paiements de cette facture spécifique
             if invoice_id:
                 context['payments'] = payment_service.get_payments_by_invoice_id(invoice_id)
+                # Récupérer le statut de la facture
+                context['invoice'] = type('obj', (object,), {'status': payment_service.get_invoice_status(invoice_id)})()
             else:
                 context['payments'] = None
+                context['invoice'] = None
             context['invoice_id'] = invoice_id
         except:
             context['payments'] = None
+            context['invoice'] = None
             context['invoice_id'] = invoice_id
 
         return context
@@ -32,6 +36,8 @@ class PaymentView(TemplateView):
         payment_method = request.POST.get('payment_method')
         state_payment = request.POST.get('state_payment')
         invoice_id = request.POST.get('invoice_id')
+        # récupération du status de la facture associée au paiement pour vérifier si le paiement est autorisé ou pas
+        status = request.POST.get('status')
         amount = request.POST.get('amount')
 
         payment_service = PaymentService()
@@ -52,7 +58,12 @@ class PaymentView(TemplateView):
 
             payment_service.create_payment(payment_method, state_payment, invoice_id, amount)
             context = self.get_context_data(**kwargs)
-            context['message'] = 'Paiement enregistré avec succès'
+            context['success'] = 'Paiement enregistré avec succès'
+            return render(request, self.template_name, context)
+        except ValueError as e:
+            # Capturer les erreurs de validation du repository
+            context = self.get_context_data(**kwargs)
+            context['error'] = str(e)
             return render(request, self.template_name, context)
         except Exception as e:
             context = self.get_context_data(**kwargs)
@@ -120,8 +131,13 @@ class PaymentUpdateView(TemplateView):
             payment_service.update_payment(payment_id, payment_method, state_payment, invoice_id, amount)
             # Rediriger vers page des paiements de la facture
             return redirect(f"{reverse('payment:payment')}?invoice_id={invoice_id}")
+        except ValueError as e:
+            # Capturer les erreurs de validation du repository
+            context = self.get_context_data(payment_id)
+            context['error'] = str(e)
+            return render(request, self.template_name, context)
         except Exception as e:
             context = self.get_context_data(payment_id)
-            context['error'] = f'Erreur lors de la mise à jour : {str(e)}'
+            context['error'] = f'Erreur lors de la modification : {str(e)}'
             return render(request, self.template_name, context)
 

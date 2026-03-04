@@ -50,9 +50,9 @@ class InvoiceOrderLineService:
         # Récupérer les objets
         invoice = self.invoice_service.get_invoice_by_id(invoice_id)
         product = self.product_service.get_product_by_id(product_id)
-        contact = self.contact_service.get_contact_by_id(contact_id)
+        contact_dto = self.contact_service.get_contact_by_id(contact_id)
 
-        return self.repo.create_invoice_order_line(invoice, product, contact, price_ht, tax, price_tax, quantity, date)
+        return self.repo.create_invoice_order_line(invoice, product, contact_dto.contact_id, price_ht, tax, price_tax, quantity, date)
 
     def delete_invoice_order_line(self, line_id):
         """Supprimer une ligne de facture"""
@@ -77,7 +77,7 @@ class InvoiceOrderLineService:
 
         invoice = self.invoice_service.get_invoice_by_id(invoice_id)
         product = self.product_service.get_product_by_id(product_id)
-        contact = self.contact_service.get_contact_by_id(contact_id)
+        contact_dto = self.contact_service.get_contact_by_id(contact_id)
 
-        return self.repo.update_invoice_order_line(line_id, invoice, product, contact, price_ht, tax, price_tax, quantity, date)
+        return self.repo.update_invoice_order_line(line_id, invoice, product, contact_dto.contact_id, price_ht, tax, price_tax, quantity, date)
 

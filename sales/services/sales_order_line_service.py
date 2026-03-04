@@ -48,9 +48,10 @@ class SalesOrderLineService:
         # Récupérer les objets
         sales_order = self.sales_order_service.get_sales_order_by_id(sales_order_id)
         product = self.product_service.get_product_by_id(product_id)
-        contact = self.contact_service.get_contact_by_id(contact_id)
+        # Extraire le DTO du contact pour obtenir l'ID, pas le DTO lui-même
+        contact_dto = self.contact_service.get_contact_by_id(contact_id)
 
-        return self.repo.create_sales_order_line(sales_order, product, contact, price_ht, tax, price_it, quantity, date, genre)
+        return self.repo.create_sales_order_line(sales_order, product, contact_dto.contact_id, price_ht, tax, price_it, quantity, date, genre)
 
     def delete_sales_order_line(self, sales_order_line_id):
         return self.repo.delete_sales_order_line(sales_order_line_id)
@@ -68,7 +69,8 @@ class SalesOrderLineService:
         self.validate_sales_order_line_data(sales_order_id, product_id, contact_id, price_ht, tax, quantity, date, genre)
         sales_order = self.sales_order_service.get_sales_order_by_id(sales_order_id)
         product = self.product_service.get_product_by_id(product_id)
-        contact = self.contact_service.get_contact_by_id(contact_id)
+        # Extraire le DTO du contact pour obtenir l'ID, pas le DTO lui-même
+        contact_dto = self.contact_service.get_contact_by_id(contact_id)
 
-        return self.repo.update_sales_order_line(sales_order_line_id, sales_order, product, contact, price_ht, tax, quantity, date, genre)
+        return self.repo.update_sales_order_line(sales_order_line_id, sales_order, product, contact_dto.contact_id, price_ht, tax, quantity, date, genre)
 

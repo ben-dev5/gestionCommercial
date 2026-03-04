@@ -35,8 +35,9 @@ class SalesOrderService:
 
     def create_sales_order(self, contact_id, genre, order_type):
         self.validate_sales_order_data(contact_id, genre, order_type)
-        contact = self.contact_service.get_contact_by_id(contact_id)
-        return self.repo.create_sales_order(contact, genre, order_type)
+        contact_dto = self.contact_service.get_contact_by_id(contact_id)
+        # Extraire l'ID du DTO pour passer l'ID au repo, pas le DTO
+        return self.repo.create_sales_order(contact_dto.contact_id, genre, order_type)
 
     def delete_sales_order(self, sales_order_id):
         return self.repo.delete_sales_order(sales_order_id)
@@ -55,8 +56,9 @@ class SalesOrderService:
 
     def update_sales_order(self, sales_order_id, contact_id, genre, order_type):
         self.validate_sales_order_data(contact_id, genre, order_type)
-        contact = self.contact_service.get_contact_by_id(contact_id)
-        return self.repo.update_sales_order(sales_order_id, contact, genre, order_type)
+        contact_dto = self.contact_service.get_contact_by_id(contact_id)
+        # Extraire l'ID du DTO pour passer l'ID au repo, pas le DTO
+        return self.repo.update_sales_order(sales_order_id, contact_dto.contact_id, genre, order_type)
 
     # Méthodes pour la signature du devis par le client
     def generate_public_hash(self, sales_order):

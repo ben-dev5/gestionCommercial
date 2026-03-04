@@ -17,6 +17,10 @@ class PaymentService:
     def get_all_payments(self):
         return self.repo.get_all_payments()
 
+    def get_invoice_status(self, invoice_id):
+        """Récupérer le statut d'une facture par son ID"""
+        return self.repo.get_invoice_status(invoice_id)
+
     def update_payment(self, payment_id, payment_method, state_payment, invoice_id, amount):
         return self.repo.update_payment(payment_id, payment_method, state_payment, invoice_id, amount)
 

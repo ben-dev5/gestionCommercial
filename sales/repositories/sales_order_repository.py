@@ -3,9 +3,9 @@ from sales.models.sales_order_models import SalesOrder
 
 class SalesOrderRepository:
 
-    def create_sales_order(self, contact, genre, order_type):
+    def create_sales_order(self, contact_id, genre, order_type):
         return SalesOrder.objects.create(
-            contact_id=contact,
+            contact_id_id=contact_id,
             genre=genre,
             type=order_type
         )
@@ -27,9 +27,9 @@ class SalesOrderRepository:
     def get_sales_orders_by_contact(self, contact_id):
         return SalesOrder.objects.filter(contact_id=contact_id).order_by('sales_order_id')
 
-    def update_sales_order(self, sales_order_id, contact, genre, order_type):
+    def update_sales_order(self, sales_order_id, contact_id, genre, order_type):
         sales_order = SalesOrder.objects.get(sales_order_id=sales_order_id)
-        sales_order.contact_id = contact
+        sales_order.contact_id_id = contact_id
         sales_order.genre = genre
         sales_order.type = order_type
         sales_order.save()

@@ -1,5 +1,4 @@
 from invoicing.models.invoice_models import Invoice
-from commons.models.contact_models import Contact
 from django.utils import timezone
 
 
@@ -9,10 +8,8 @@ class InvoiceRepository:
 
     def create_invoice(self, contact_id, name, address, city, state, zip_code, siret, email, phone, status='Brouillon', created_at=None):
         """Créer une nouvelle facture"""
-        # Récupérer l'instance Contact avec l'ID
-        contact = Contact.objects.get(contact_id=contact_id)
         invoice = Invoice.objects.create(
-            contact_id=contact,
+            contact_id_id=contact_id,
             name=name,
             address=address,
             city=city,
@@ -48,9 +45,7 @@ class InvoiceRepository:
     def update_invoice(self, invoice_id, contact_id, name, address, city, state, zip_code, siret, email, phone, status, created_at=None):
         """Mettre à jour une facture"""
         invoice = self.get_invoice_by_id(invoice_id)
-        # Récupérer l'instance Contact avec l'ID
-        contact = Contact.objects.get(contact_id=contact_id)
-        invoice.contact_id = contact
+        invoice.contact_id_id = contact_id
         invoice.name = name
         invoice.address = address
         invoice.city = city

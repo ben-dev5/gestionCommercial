@@ -188,9 +188,11 @@ class SalesOrderUpdateView(TemplateView):
         contacts = contact_service.get_all_contacts()
 
         if self.request.method == 'GET':
+            # Récupérer l'ID du contact depuis la relation
+            contact_id_value = sales_order.contact_id.contact_id if hasattr(sales_order.contact_id, 'contact_id') else sales_order.contact_id.id
             form = SalesOrderForm(
                 initial={
-                    'contact_id': str(sales_order.contact_id.contact_id),
+                    'contact_id': str(contact_id_value),
                     'genre': sales_order.genre,
                     'type': sales_order.type,
                 },
