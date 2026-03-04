@@ -4,7 +4,7 @@
 <div class="container mt-4">
     <div class="row">
         <div class="col-md-8 offset-md-2">
-            <h1>{% if sales_order %}Modifier{% else %}Créer{% endif %} un devis/commande</h1>
+            <h1>{% if sales_order %}Modifier{% else %}Créer un Devis{% endif %}</h1>
 
             <form method="post" class="mt-4">
                 {% csrf_token %}
@@ -17,7 +17,7 @@
                     {% endif %}
                 </div>
 
-                <div class="mb-3">
+                <div class="mb-3" style="display: none;">
                     <label for="{{ form.type.id_for_label }}" class="form-label">Type</label>
                     {{ form.type }}
                     {% if form.type.errors %}

@@ -46,7 +46,7 @@
                     {% if sales_order.type == 'Commande' %}
                         <form method="post" action="{% url 'invoicing:create_from_sales' sales_order.pk %}" style="display:inline;">
                             {% csrf_token %}
-                            <button type="submit" class="btn btn-success" title="Créer une facture à partir de ce devis/commande">
+                            <button type="submit" class="btn btn-success" title="Créer une facture à partir de cette commande">
                                 <i class="bi bi-receipt"></i> Créer facture
                             </button>
                         </form>
