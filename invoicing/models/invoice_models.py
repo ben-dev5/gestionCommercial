@@ -1,6 +1,5 @@
 from django.db import models
 from django.utils import timezone
-
 from commons.models.contact_models import Contact
 
 STATUS_CHOICES = (

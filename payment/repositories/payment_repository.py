@@ -18,7 +18,7 @@ class PaymentRepository:
         return Payment.objects.create(
             payment_method=payment_method,
             state_payment=state_payment,
-            invoice_id=invoice_id,
+            invoice_id=invoice,
             amount=amount
         )
 

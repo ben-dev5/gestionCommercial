@@ -8,12 +8,13 @@ from payment.services.payment_service import PaymentService
 class PaymentView(TemplateView):
     template_name = 'payment/payment.html'
 
-    def get_context_data(self, **kwargs):
+    def get_context_data(self, invoice_id=None, **kwargs):
         context = super().get_context_data(**kwargs)
         payment_service = PaymentService()
 
-        # Récupérer invoice_id depuis les paramètres de requête
-        invoice_id = self.request.GET.get('invoice_id')
+        # Récupérer invoice_id depuis les paramètres de requête ou passé en paramètre
+        if not invoice_id:
+            invoice_id = self.request.GET.get('invoice_id')
 
         try:
             # Affiche seulement les paiements de cette facture spécifique
@@ -37,14 +38,13 @@ class PaymentView(TemplateView):
         state_payment = request.POST.get('state_payment')
         invoice_id = request.POST.get('invoice_id')
         # récupération du status de la facture associée au paiement pour vérifier si le paiement est autorisé ou pas
-        status = request.POST.get('status')
         amount = request.POST.get('amount')
 
         payment_service = PaymentService()
         try:
             # Vérifier que tous les champs sont remplis
             if not all([payment_method, state_payment, invoice_id, amount]):
-                context = self.get_context_data(**kwargs)
+                context = self.get_context_data(invoice_id=invoice_id)
                 context['error'] = 'Tous les champs sont obligatoires'
                 return render(request, self.template_name, context)
 
@@ -52,21 +52,21 @@ class PaymentView(TemplateView):
             try:
                 amount = float(amount)
             except ValueError:
-                context = self.get_context_data(**kwargs)
+                context = self.get_context_data(invoice_id=invoice_id)
                 context['error'] = 'Le montant doit être un nombre valide'
                 return render(request, self.template_name, context)
 
             payment_service.create_payment(payment_method, state_payment, invoice_id, amount)
-            context = self.get_context_data(**kwargs)
+            context = self.get_context_data(invoice_id=invoice_id)
             context['success'] = 'Paiement enregistré avec succès'
             return render(request, self.template_name, context)
         except ValueError as e:
             # Capturer les erreurs de validation du repository
-            context = self.get_context_data(**kwargs)
+            context = self.get_context_data(invoice_id=invoice_id)
             context['error'] = str(e)
             return render(request, self.template_name, context)
         except Exception as e:
-            context = self.get_context_data(**kwargs)
+            context = self.get_context_data(invoice_id=invoice_id)
             context['error'] = f'Erreur lors de l\'enregistrement : {str(e)}'
             return render(request, self.template_name, context)
 
