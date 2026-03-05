@@ -66,7 +66,7 @@ class InvoiceService:
             raise ValueError("Impossible de modifier une facture annulée")
         # Empêcher le passage d'une facture en statut 'Brouillon' si elle n'était pas déjà en brouillon
         if current_invoice.status == 'Brouillon':
-            if status != 'Brouillon':
+            if status == 'Brouillon':
                 raise ValueError("Impossible de passer une facture en statut 'Brouillon' si elle était déjà en brouillon")
         # Extraire l'ID du DTO (contact_service retourne un ContactDTO)
         contact_dto = self.contact_service.get_contact_by_id(contact_id)
