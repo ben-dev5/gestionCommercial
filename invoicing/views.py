@@ -1,6 +1,5 @@
 from django.http import Http404
 from datetime import datetime
-from commons.dtos import CreateContactDTO, UpdateContactDTO, ContactDTO
 from invoicing.services.invoice_service import InvoiceService
 from invoicing.services.invoice_order_line_service import InvoiceOrderLineService
 from invoicing.forms import  InvoiceDateForm
@@ -85,8 +84,13 @@ class InvoiceDetailView(TemplateView):
                 if form.is_valid():
                     new_date = form.cleaned_data['created_at']
 
+            # Impossible de modifier le status d'une facture annulée
             if 'status' in request.POST:
                 new_status = request.POST.get('status')
+                if invoice.status == 'Annulée' and new_status != 'Annulée':
+                    messages.error(request, "Impossible de modifier le statut d'une facture annulée")
+                    return redirect('invoicing:invoice_detail', pk=pk)
+
 
             invoice_service.update_invoice(
                 invoice_id=pk,
