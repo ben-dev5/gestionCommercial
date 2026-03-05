@@ -43,27 +43,39 @@
     <div class="card mb-4">
         <div class="card-body">
             <h5 class="card-title">Informations administratives</h5>
-            <form method="post" class="row g-3">
-                {% csrf_token %}
+            <div class="row g-3">
+                <!-- Date de la facture -->
                 <div class="col-md-6">
                     <label for="created_at" class="form-label">Date de la facture</label>
-                    {{ date_form.created_at }}
+                    <form method="post" class="d-flex gap-2">
+                        {% csrf_token %}
+                        {{ date_form.created_at }}
+                        <button type="submit" class="btn btn-sm btn-primary">
+                            <i class="bi bi-check-circle"></i> Mettre à jour
+                        </button>
+                    </form>
                 </div>
+
+                <!-- Statut de la facture -->
                 <div class="col-md-6">
-                    <label for="status" class="form-label">Status</label>
-                    <select id="status" name="status" class="form-select">
-                        <option disabled value="Brouillon" {% if invoice.status == 'Brouillon' %}selected{% endif %}>Brouillon</option>
-                        <option value="Confirmé" {% if invoice.status == 'Confirmé' %}selected{% endif %}>Confirmé</option>
-                        <option value="Comptabilisé" {% if invoice.status == 'Comptabilisé' %}selected{% endif %}>Comptabilisé</option>
-                        <option value="Annulée" {% if invoice.status == 'Annulée' %}selected{% endif %}>Annulée</option>
-                    </select>
+                    <label class="form-label">Status</label>
+                    <form method="post" class="d-flex flex-wrap gap-2">
+                        {% csrf_token %}
+                        <button type="submit" name="status" value="Brouillon"  class="btn btn-sm {% if invoice.status == 'Brouillon' %}btn-secondary{% else %}btn-outline-secondary{% endif %}" title="Brouillon" disabled>
+                            <i class="bi bi-file-text"></i> Brouillon
+                        </button>
+                        <button type="submit" name="status" value="Confirmé" class="btn btn-sm {% if invoice.status == 'Confirmé' %}btn-primary{% else %}btn-outline-primary{% endif %}" title="Confirmé">
+                            <i class="bi bi-check-circle"></i> Confirmé
+                        </button>
+                        <button type="submit" name="status" value="Comptabilisé" class="btn btn-sm {% if invoice.status == 'Comptabilisé' %}btn-success{% else %}btn-outline-success{% endif %}" title="Comptabilisé">
+                            <i class="bi bi-book"></i> Comptabilisé
+                        </button>
+                        <button type="submit" name="status" value="Annulée" class="btn btn-sm {% if invoice.status == 'Annulée' %}btn-danger{% else %}btn-outline-danger{% endif %}" title="Annulée">
+                            <i class="bi bi-x-circle"></i> Annulée
+                        </button>
+                    </form>
                 </div>
-                <div class="col-12">
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-circle"></i> Mettre à jour
-                    </button>
-                </div>
-            </form>
+            </div>
         </div>
     </div>
 
