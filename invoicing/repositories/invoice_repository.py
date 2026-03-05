@@ -69,3 +69,9 @@ class InvoiceRepository:
         """Récupérer les factures d'un contact"""
         return Invoice.objects.filter(contact_id=contact_id)
 
+    def invoice_canceled(self, invoice_id):
+        """Annuler une facture"""
+        invoice = self.get_invoice_by_id(invoice_id)
+        invoice.status = 'Annulée'
+        invoice.save()
+        return invoice

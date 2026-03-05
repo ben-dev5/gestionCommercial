@@ -61,3 +61,12 @@ class InvoiceService:
         contact_dto = self.contact_service.get_contact_by_id(contact_id)
         return self.repo.update_invoice(invoice_id, contact_dto.contact_id, name, address, city, state, zip_code, siret, email, phone, status, created_at)
 
+    def invoice_canceled(self, invoice_id):
+        """Annulation d'une facture"""
+        invoice = self.repo.get_invoice_by_id(invoice_id)
+        if invoice.status == 'Annulée':
+            raise ValueError("La facture est déjà annulée")
+        invoice.status = 'Annulée'
+        invoice.save()
+
+

@@ -31,6 +31,3 @@ class PaymentService:
         """Récupérer le statut d'un paiement par son ID"""
         return self.repo.get_state_payment(payment_id)
 
-    def is_invoice_fully_paid(self, invoice_id):
-        """Vérifier si une facture est complètement payée"""
-        return self.repo.is_invoice_fully_paid(invoice_id)

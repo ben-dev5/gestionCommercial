@@ -10,7 +10,6 @@ from sales.sales_order_pdf import SalesOrderPDFService
 import csv
 import logging
 from decimal import Decimal, InvalidOperation
-
 from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.contrib import messages
@@ -356,3 +355,20 @@ class InvoiceExportCSVView(TemplateView):
             logger.exception("Erreur lors de l'export des factures")
             messages.error(request, f"Erreur lors de l'export : {str(e)}")
             return redirect('invoicing:invoice_list')
+
+class InvoiceCancelView(TemplateView):
+
+    template_name = "invoicing/invoice_detail.html"
+
+    def post(self, request, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        invoice_service = InvoiceService()
+
+
+        try:
+            invoice_service.invoice_canceled(pk)
+            messages.success(request, f"Facture #{pk} annulée avec succès !")
+            return redirect('invoicing:invoice_detail', pk=pk)
+        except Exception as e:
+            messages.error(request, f"Erreur lors de l'annulation : {str(e)}")
+            return redirect('invoicing:invoice_detail', pk=pk)
