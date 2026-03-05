@@ -48,6 +48,12 @@ class PaymentView(TemplateView):
                 context['error'] = 'Tous les champs sont obligatoires'
                 return render(request, self.template_name, context)
 
+            # Vérifier si la facture est déjà payée
+            if payment_service.is_invoice_fully_paid(invoice_id):
+                context = self.get_context_data(invoice_id=invoice_id)
+                context['error'] = 'La facture est déjà payée.'
+                return render(request, self.template_name, context)
+
             # Convertir amount en nombre
             try:
                 amount = float(amount)

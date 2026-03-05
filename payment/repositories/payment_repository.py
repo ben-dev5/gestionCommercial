@@ -50,3 +50,21 @@ class PaymentRepository:
         payment = Payment.objects.get(payment_id=payment_id)
         payment.delete()
         return True
+
+    def get_state_payment(self, payment_id):
+        """Récupérer le statut d'un paiement par son ID"""
+        payment = Payment.objects.get(payment_id=payment_id)
+        return payment.state_payment
+
+    def is_invoice_fully_paid(self, invoice_id):
+        """Vérifier si une facture est complètement payée"""
+        try:
+            invoice = Invoice.objects.get(invoice_id=invoice_id)
+            # Récupérer le total des paiements pour cette facture
+            payments = Payment.objects.filter(invoice_id=invoice_id, state_payment='Réglé')
+            total_paid = sum(payment.amount for payment in payments)
+
+            # Comparer avec le total TTC de la facture (calculé via la property total_amount)
+            return total_paid >= invoice.total_amount
+        except Invoice.DoesNotExist:
+            return False
