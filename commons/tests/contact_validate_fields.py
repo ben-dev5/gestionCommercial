@@ -78,7 +78,7 @@ class ContactValidateFieldsTests(TestCase):
         )
         self.contact = self.service.create_contact(contact_dto)
         # Vérifier que les types sont différents
-
+        self.assertNotEqual(self.contact.type, "client")
     def test_delete_contact(self):
         self.service = ContactService()
         contact_dto = CreateContactDTO(

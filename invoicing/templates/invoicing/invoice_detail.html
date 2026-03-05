@@ -74,16 +74,17 @@
                 <!-- pas obligatoire de passer par la  -->
                 <strong>Status de paiement</strong>
                 {% with statuses=invoice.state_payment %}
-                {% if 'En attente' in statuses %}
-                    <span class="badge bg-warning">En attente</span>
-                {% elif 'En cours' in statuses %}
-                    <span class="badge bg-info">En cours</span>
-                {% elif 'Payé' in statuses %}
-                    <span class="badge bg-success">Payé</span>
-                {% else %}
+                {% if 'Payé' in statuses %}
+                    <span class="badge bg-warning">Payé</span>
+                {% elif 'En cours' or 'En attente' in statuses %}
+                    <span class="badge bg-info">Payé</span>
+                    {% if 'Payé' in statuses %}
+                    <span class="badge bg-success">Partiellement Payé</span>
+                    { % else %}
                     <span class="badge bg-secondary">Aucun paiement</span>
+                    {% endif %}
                 {% endif %}
-            {% endwith %}
+                {% endwith %}
             </div>
             <a href="{% url 'payment:payment' %}?invoice_id={{ invoice.invoice_id }}" class="btn btn-outline-secondary mb-3">
                 <i class="bi bi-credit-card"></i> Voir les paiements
@@ -129,7 +130,11 @@
                                     {% if line.amount_remaining <= 0 %}
                                         <span class="badge bg-success">Réglé</span>
                                     {% else %}
-                                        <span class="badge bg-warning">Non réglé</span>
+                                        {% if line.amount_paid > 0 %}
+                                        <span class="badge bg-warning">Partiellement réglé</span>
+                                        {% elif line.amount_remaining > 0  %}
+                                        <span class="badge bg-info">Non réglé</span>
+                                        {% endif %}
                                     {% endif %}
                                 </td>
                             </tr>

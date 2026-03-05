@@ -28,8 +28,7 @@ class PaymentRepository:
     def get_payments_by_invoice_id(self, invoice_id):
         return Payment.objects.filter(invoice_id=invoice_id).order_by('-created_at')
 
-    # récupération du status de la facture associée à un paiement pour vérifier si le paiement est autorisé ou pas
-
+    # récupération status facture pour valider paiement
     def get_invoice_status(self, invoice_id):
         """Récupérer le statut d'une facture par son ID"""
         invoice = Invoice.objects.get(invoice_id=invoice_id)
