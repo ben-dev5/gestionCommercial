@@ -113,6 +113,24 @@ class InvoiceDetailView(TemplateView):
         return redirect('invoicing:invoice_detail', pk=pk)
 
 
+class InvoiceCancelView(TemplateView):
+    """Vue pour annuler une facture"""
+
+    def post(self, request, *args, **kwargs):
+        pk = self.kwargs.get('pk')
+        invoice_service = InvoiceService()
+
+        try:
+            invoice_service.cancel_invoice(pk)
+            messages.success(request, f"Facture #{pk} annulée avec succès !")
+            return redirect('invoicing:invoice_detail', pk=pk)
+        except ValueError as e:
+            messages.error(request, str(e))
+            return redirect('invoicing:invoice_detail', pk=pk)
+        except Exception as e:
+            messages.error(request, f"Erreur lors de l'annulation : {str(e)}")
+            return redirect('invoicing:invoice_detail', pk=pk)
+
 class CreateInvoiceFromSalesOrderView(TemplateView):
     """Vue pour transformer un devis/commande en facture"""
 
@@ -355,20 +373,3 @@ class InvoiceExportCSVView(TemplateView):
             logger.exception("Erreur lors de l'export des factures")
             messages.error(request, f"Erreur lors de l'export : {str(e)}")
             return redirect('invoicing:invoice_list')
-
-class InvoiceCancelView(TemplateView):
-
-    template_name = "invoicing/invoice_detail.html"
-
-    def post(self, request, *args, **kwargs):
-        pk = self.kwargs.get('pk')
-        invoice_service = InvoiceService()
-
-
-        try:
-            invoice_service.invoice_canceled(pk)
-            messages.success(request, f"Facture #{pk} annulée avec succès !")
-            return redirect('invoicing:invoice_detail', pk=pk)
-        except Exception as e:
-            messages.error(request, f"Erreur lors de l'annulation : {str(e)}")
-            return redirect('invoicing:invoice_detail', pk=pk)

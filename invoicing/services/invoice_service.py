@@ -57,16 +57,25 @@ class InvoiceService:
     def update_invoice(self, invoice_id, contact_id, name, address, city, state, zip_code, siret, email, phone, status, created_at=None):
         """Mettre à jour une facture"""
         self.validate_invoice_data(contact_id, name, address, city, state, zip_code, siret, email, phone)
+
+        # Récupérer la facture actuelle pour vérifier son statut
+        current_invoice = self.repo.get_invoice_by_id(invoice_id)
+
+        # Empêcher la modification d'une facture annulée
+        if current_invoice.status == 'Annulée':
+            raise ValueError("Impossible de modifier une facture annulée")
+
         # Extraire l'ID du DTO (contact_service retourne un ContactDTO)
         contact_dto = self.contact_service.get_contact_by_id(contact_id)
         return self.repo.update_invoice(invoice_id, contact_dto.contact_id, name, address, city, state, zip_code, siret, email, phone, status, created_at)
 
-    def invoice_canceled(self, invoice_id):
-        """Annulation d'une facture"""
+    def cancel_invoice(self, invoice_id):
+        """Annuler une facture"""
         invoice = self.repo.get_invoice_by_id(invoice_id)
         if invoice.status == 'Annulée':
+            # Si la facture est déjà annulée, on ne peut pas modifier le statut
+
             raise ValueError("La facture est déjà annulée")
-        invoice.status = 'Annulée'
-        invoice.save()
+        return self.repo.update_invoice(invoice_id, invoice.contact_id_id, invoice.name, invoice.address, invoice.city, invoice.state, invoice.zip_code, invoice.siret, invoice.email, invoice.phone, 'Annulée', invoice.created_at)
 
 

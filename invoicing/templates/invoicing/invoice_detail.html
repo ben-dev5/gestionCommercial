@@ -58,7 +58,7 @@
 
                 <!-- Statut de la facture appelait la InvoiceCancelView  -->
                 <div class="col-md-6">
-                    <label class="form-label">Status</label>
+                   <label class="form-label">Status</label>
                     <form method="post" class="d-flex flex-wrap gap-2">
                         {% csrf_token %}
                         <button type="submit" name="status" value="Brouillon"  class="btn btn-sm {% if invoice.status == 'Brouillon' %}btn-secondary{% else %}btn-outline-secondary{% endif %}" title="Brouillon" disabled>
@@ -70,7 +70,6 @@
                         <button type="submit" name="status" value="Comptabilisé" class="btn btn-sm {% if invoice.status == 'Comptabilisé' %}btn-success{% else %}btn-outline-success{% endif %}" title="Comptabilisé">
                             <i class="bi bi-book"></i> Comptabilisé
                         </button>
-                        <a href ="{% url 'invoicing:invoice_cancel' invoice.invoice_id %}" class="btn btn-sm>
                         <button type="submit" name="status" value="Annulée" class="btn btn-sm {% if invoice.status == 'Annulée' %}btn-danger{% else %}btn-outline-danger{% endif %}" title="Annulée">
                             <i class="bi bi-x-circle"></i> Annulée
                         </button>
