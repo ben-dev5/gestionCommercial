@@ -6,6 +6,10 @@ class PaymentService:
         self.repo = PaymentRepository()
 
     def create_payment(self, payment_method, state_payment, invoice_id, amount):
+
+        # Vérifier que facture n'est pas en statut "Brouillon" ou "Annulée" avant de créer un paiement
+        if self.repo.get_invoice_status(invoice_id) in ['Brouillon', 'Annulée']:
+            raise ValueError("Impossible de créer un paiement pour une facture en statut 'Brouillon' ou 'Annulée'. Veuillez vérifier le statut de la facture avant de créer un paiement.")
         return self.repo.create_payment(payment_method, state_payment, invoice_id, amount)
 
     def get_payment_by_id(self, payment_id):
