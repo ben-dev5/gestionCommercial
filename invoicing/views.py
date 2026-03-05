@@ -83,12 +83,8 @@ class InvoiceDetailView(TemplateView):
                 if form.is_valid():
                     new_date = form.cleaned_data['created_at']
 
-            # Impossible de modifier le status d'une facture annulée
             if 'status' in request.POST:
                 new_status = request.POST.get('status')
-                if invoice.status == 'Annulée' and new_status != 'Annulée':
-                    messages.error(request, "Impossible de modifier le statut d'une facture annulée")
-                    return redirect('invoicing:invoice_detail', pk=pk)
 
 
             invoice_service.update_invoice(

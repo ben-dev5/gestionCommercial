@@ -6,6 +6,23 @@
         <div class="col-md-8">
             <h1>Facture #{{ invoice.invoice_id }}</h1>
             <p class="text-muted">{{ invoice.contact_id.first_name }} {{ invoice.contact_id.last_name }}</p>
+
+            <!-- Boutons de statut -->
+            <form method="post" class="d-flex flex-wrap gap-2 mt-3">
+                {% csrf_token %}
+                <button type="submit" name="status" value="Brouillon"  class="btn btn-sm {% if invoice.status == 'Brouillon' %}btn-secondary{% else %}btn-outline-secondary{% endif %}" title="Brouillon" disabled>
+                    <i class="bi bi-file-text"></i> Brouillon
+                </button>
+                <button type="submit" name="status" value="Confirmé" class="btn btn-sm {% if invoice.status == 'Confirmé' %}btn-primary{% else %}btn-outline-primary{% endif %}" title="Confirmé">
+                    <i class="bi bi-check-circle"></i> Confirmé
+                </button>
+                <button type="submit" name="status" value="Comptabilisé" class="btn btn-sm {% if invoice.status == 'Comptabilisé' %}btn-success{% else %}btn-outline-success{% endif %}" title="Comptabilisé">
+                    <i class="bi bi-book"></i> Comptabilisé
+                </button>
+                <button type="submit" name="status" value="Annulée" class="btn btn-sm {% if invoice.status == 'Annulée' %}btn-danger{% else %}btn-outline-danger{% endif %}" title="Annulée">
+                    <i class="bi bi-x-circle"></i> Annulée
+                </button>
+            </form>
         </div>
         <div class="col-md-4 text-end">
             {% if has_lines %}
@@ -52,26 +69,6 @@
                         {{ date_form.created_at }}
                         <button type="submit" class="btn btn-sm btn-primary">
                             <i class="bi bi-check-circle"></i> Mettre à jour
-                        </button>
-                    </form>
-                </div>
-
-                <!-- Statut de la facture appelait la InvoiceCancelView  -->
-                <div class="col-md-6">
-                   <label class="form-label">Status</label>
-                    <form method="post" class="d-flex flex-wrap gap-2">
-                        {% csrf_token %}
-                        <button type="submit" name="status" value="Brouillon"  class="btn btn-sm {% if invoice.status == 'Brouillon' %}btn-secondary{% else %}btn-outline-secondary{% endif %}" title="Brouillon" disabled>
-                            <i class="bi bi-file-text"></i> Brouillon
-                        </button>
-                        <button type="submit" name="status" value="Confirmé" class="btn btn-sm {% if invoice.status == 'Confirmé' %}btn-primary{% else %}btn-outline-primary{% endif %}" title="Confirmé">
-                            <i class="bi bi-check-circle"></i> Confirmé
-                        </button>
-                        <button type="submit" name="status" value="Comptabilisé" class="btn btn-sm {% if invoice.status == 'Comptabilisé' %}btn-success{% else %}btn-outline-success{% endif %}" title="Comptabilisé">
-                            <i class="bi bi-book"></i> Comptabilisé
-                        </button>
-                        <button type="submit" name="status" value="Annulée" class="btn btn-sm {% if invoice.status == 'Annulée' %}btn-danger{% else %}btn-outline-danger{% endif %}" title="Annulée">
-                            <i class="bi bi-x-circle"></i> Annulée
                         </button>
                     </form>
                 </div>
