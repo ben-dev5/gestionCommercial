@@ -183,14 +183,30 @@ class InvoicePdfView(TemplateView):
             invoice = invoice_service.get_invoice_by_id(pk)
             lines = invoice_line_service.get_invoice_order_lines_by_invoice(pk)
 
+            # Récupération des paiements
+            payments = invoice.payments.all() if hasattr(invoice, 'payments') else []
+            total_paid = sum(p.amount for p in payments) if payments else 0
+            invoice_total_ttc = sum(line.price_tax for line in lines)
+
+            # Déterminer le statut de paiement
+            if total_paid >= invoice_total_ttc:
+                payment_status = "Payé"
+            elif total_paid > 0:
+                payment_status = "Partiellement Payé"
+            else:
+                payment_status = "Aucun paiement"
+
             # Créer un objet facture compatible avec le service PDF
             class InvoicePdfAdapter:
-                def __init__(self, invoice):
+                def __init__(self, invoice, payments, total_paid, payment_status):
                     self.contact_id = invoice.contact_id
                     self.type = "Facture"
                     self.genre = "Facture"
                     self.created_at = datetime.now()
                     self.invoice_id = invoice.invoice_id
+                    self.payments = payments
+                    self.total_paid = total_paid
+                    self.payment_status = payment_status
 
             # Créer des adaptateurs pour les lignes
             class InvoiceLinePdfAdapter:
@@ -203,7 +219,7 @@ class InvoicePdfView(TemplateView):
                     self.tax = line.tax
                     self.price_it = line.price_tax  # Mapper price_tax vers price_it
 
-            invoice_adapter = InvoicePdfAdapter(invoice)
+            invoice_adapter = InvoicePdfAdapter(invoice, payments, total_paid, payment_status)
             adapted_lines = [InvoiceLinePdfAdapter(line) for line in lines]
 
             pdf_buffer = pdf_service.generate_pdf(invoice_adapter, adapted_lines)

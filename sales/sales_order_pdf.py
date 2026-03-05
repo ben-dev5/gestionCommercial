@@ -43,8 +43,13 @@ class SalesOrderPDFService:
         story.append(Spacer(1, 0.5*cm))
 
         # Totaux
-        story.extend(self._build_totals(lines))
-        story.append(Spacer(1, 1*cm))
+        story.extend(self._build_totals(sales_order, lines))
+        story.append(Spacer(1, 0.5*cm))
+
+        # Section des paiements (si c'est une facture avec paiements)
+        if hasattr(sales_order, 'payments') and sales_order.payments:
+            story.extend(self._build_payments_section(sales_order))
+            story.append(Spacer(1, 0.5*cm))
 
         # Pied de page
         story.extend(self._build_footer())
@@ -206,7 +211,7 @@ class SalesOrderPDFService:
         elements.append(table)
         return elements
 
-    def _build_totals(self, lines):
+    def _build_totals(self, sales_order, lines):
         """Construire la section des totaux"""
         elements = []
 
@@ -236,6 +241,88 @@ class SalesOrderPDFService:
         ]))
 
         elements.append(table)
+        return elements
+
+    def _build_payments_section(self, sales_order):
+        """Construire la section des paiements pour les factures"""
+        elements = []
+
+        # Titre de la section
+        title_style = ParagraphStyle(
+            'PaymentTitle',
+            parent=self.styles['Normal'],
+            fontSize=12,
+            textColor=self.primary_color,
+            fontName='Helvetica-Bold',
+            spaceAfter=10
+        )
+
+        title = Paragraph("Informations de paiement", title_style)
+        elements.append(title)
+
+        # Statut de paiement
+        status_style = ParagraphStyle(
+            'PaymentStatus',
+            parent=self.styles['Normal'],
+            fontSize=10,
+            spaceAfter=10
+        )
+
+        status_text = f"<b>Statut :</b> {sales_order.payment_status}"
+        status = Paragraph(status_text, status_style)
+        elements.append(status)
+
+        # Tableau des paiements
+        if sales_order.payments:
+            payments_data = [['Date', 'Méthode', 'Statut', 'Montant']]
+
+            for payment in sales_order.payments:
+                payments_data.append([
+                    Paragraph(payment.created_at.strftime('%d/%m/%Y') if hasattr(payment, 'created_at') else '-', self.styles['Normal']),
+                    Paragraph(payment.payment_method if hasattr(payment, 'payment_method') else '-', self.styles['Normal']),
+                    Paragraph(payment.state_payment if hasattr(payment, 'state_payment') else '-', self.styles['Normal']),
+                    Paragraph(f"{payment.amount:.2f}€" if hasattr(payment, 'amount') else '-', self.styles['Normal']),
+                ])
+
+            table = Table(payments_data, colWidths=[3*cm, 3*cm, 3*cm, 2*cm])
+            table.setStyle(TableStyle([
+                # En-tête
+                ('BACKGROUND', (0, 0), (-1, 0), self.primary_color),
+                ('TEXTCOLOR', (0, 0), (-1, 0), white),
+                ('ALIGN', (0, 0), (-1, 0), 'CENTER'),
+                ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+                ('FONTSIZE', (0, 0), (-1, 0), 9),
+                ('BOTTOMPADDING', (0, 0), (-1, 0), 8),
+                ('TOPPADDING', (0, 0), (-1, 0), 8),
+
+                # Lignes
+                ('BACKGROUND', (0, 1), (-1, -1), self.secondary_color),
+                ('ALIGN', (0, 1), (-1, -1), 'RIGHT'),
+                ('FONTSIZE', (0, 1), (-1, -1), 9),
+                ('BOTTOMPADDING', (0, 1), (-1, -1), 6),
+                ('TOPPADDING', (0, 1), (-1, -1), 6),
+
+                # Bordures
+                ('GRID', (0, 0), (-1, -1), 1, HexColor('#CCCCCC')),
+                ('ROWBACKGROUNDS', (0, 1), (-1, -1), [white, self.secondary_color]),
+            ]))
+
+            elements.append(table)
+
+            # Afficher le total payé
+            total_paid_style = ParagraphStyle(
+                'TotalPaid',
+                parent=self.styles['Normal'],
+                fontSize=10,
+                fontName='Helvetica-Bold',
+                spaceAfter=5,
+                textColor=self.primary_color
+            )
+
+            total_paid_text = f"<b>Total payé :</b> {sales_order.total_paid:.2f}€"
+            total_paid = Paragraph(total_paid_text, total_paid_style)
+            elements.append(total_paid)
+
         return elements
 
     def _build_footer(self):
