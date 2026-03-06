@@ -1,3 +1,5 @@
+from django.contrib.messages.context_processors import messages
+from django.template.loader import render_to_string
 from payment.repositories.payment_repository import PaymentRepository
 
 class PaymentService:
@@ -8,15 +10,12 @@ class PaymentService:
     def create_payment(self, payment_method, state_payment, invoice_id, amount):
         # Vérifier que facture n'est pas en statut "Brouillon" ou "Annulée" avant de créer un paiement
         if self.repo.get_invoice_status(invoice_id) in ['Brouillon', 'Annulée']:
-            raise ValueError("Impossible de créer un paiement pour une facture en statut 'Brouillon' ou 'Annulée'. Veuillez vérifier le statut de la facture avant de créer un paiement.")
-
+            return {'success': False, 'error': "Impossible de créer un paiement pour une facture en statut 'Brouillon' ou 'Annulée'. Veuillez vérifier le statut de la facture avant de créer un paiement."}
         # Vérifier que le reste à payer est supérieur à 0 avant de créer un paiement
-        if not self.repo.get_state_invoice_payment(invoice_id):
-            raise ValueError("Impossible de créer un paiement pour une facture déjà payée. Veuillez vérifier le statut de la facture avant de créer un paiement.")
-        else :
-            return self.repo.create_payment(payment_method, state_payment, invoice_id, amount)
+        if self.repo.get_state_invoice_payment(invoice_id):
+            return {'success': False, 'error': "Impossible de créer un paiement pour une facture déjà payée. Veuillez vérifier le statut de la facture avant de créer un paiement."}
 
-
+        return self.repo.create_payment(payment_method, state_payment, invoice_id, amount)
 
     def get_payment_by_id(self, payment_id):
         return self.repo.get_payment_by_id(payment_id)

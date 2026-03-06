@@ -56,7 +56,15 @@ class PaymentView(TemplateView):
                 context['error'] = 'Le montant doit être un nombre valide'
                 return render(request, self.template_name, context)
 
-            payment_service.create_payment(payment_method, state_payment, invoice_id, amount)
+            # Créer le paiement
+            result = payment_service.create_payment(payment_method, state_payment, invoice_id, amount)
+
+            # Vérifier si le résultat est un dictionnaire d'erreur
+            if isinstance(result, dict) and not result.get('success', True):
+                context = self.get_context_data(invoice_id=invoice_id)
+                context['error'] = result.get('error')
+                return render(request, self.template_name, context)
+
             context = self.get_context_data(invoice_id=invoice_id)
             context['success'] = 'Paiement enregistré avec succès'
             return render(request, self.template_name, context)
