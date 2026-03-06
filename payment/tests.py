@@ -43,7 +43,9 @@ class PaymentTests(TestCase):
 
         # Création d'un paiement pour les tests
         self.service = PaymentService()
+        payment_id = self.service.get_payment_by_id(self.invoice.invoice_id)
         payment = self.service.create_payment(
+            payment_id_id=payment_id,
             payment_method="Carte bancaire",
             state_payment="En attente",
             invoice_id=self.invoice.invoice_id,
@@ -54,10 +56,20 @@ class PaymentTests(TestCase):
 
     def test_create_payment(self):
         # Récupérer le paiement créé via le service
-        payment = self.service.get_payment_by_id(self.payment.payment_id)
+        payment = self.service.get_payment_by_id(self.payment.payment_id_id)
 
         self.assertIsNotNone(payment)
         self.assertEqual(payment.payment_method, "Carte bancaire")
         self.assertEqual(payment.state_payment, "En attente")
         self.assertEqual(payment.invoice_id.invoice_id, self.invoice.invoice_id)
         self.assertEqual(payment.amount, 100)
+
+
+    def test_delete_payment(self):
+        # Supprimer le paiement créé
+        result = self.service.delete_payment(self.payment.payment_id_id)
+        self.assertTrue(result)
+
+        # Vérifier que le paiement n'existe plus
+        with self.assertRaises(Exception):
+            self.service.get_payment_by_id(self.payment.payment_id_id)

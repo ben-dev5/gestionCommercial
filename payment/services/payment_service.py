@@ -40,3 +40,10 @@ class PaymentService:
         """Récupérer le statut d'un paiement par son ID"""
         return self.repo.get_state_payment(payment_id)
 
+    def get_payment_id_by_invoice_id(self, invoice_id):
+        """Récupérer l'ID d'un paiement par l'ID de la facture associée"""
+        payments = self.repo.get_payments_by_invoice_id(invoice_id)
+        if payments.exists():
+            return payments.first().payment_id
+        return None
+

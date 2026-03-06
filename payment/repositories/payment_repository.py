@@ -60,3 +60,8 @@ class PaymentRepository:
         """Récupérer le statut de paiement d'une facture par son ID"""
         invoice = Invoice.objects.get(invoice_id=invoice_id)
         return invoice.is_paid
+
+    def get_payment_id(self, invoice_id):
+        """Récupérer l'ID du paiement associé à une facture par son ID"""
+        payment = Payment.objects.filter(invoice_id=invoice_id).first()
+        return payment.payment_id if payment else None
