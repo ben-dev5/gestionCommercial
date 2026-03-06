@@ -1,5 +1,4 @@
 from django.test import TestCase
-from payment.services.payment_service import PaymentService
 from commons.dtos import CreateContactDTO
 from invoicing.services.invoice_service import InvoiceService
 from payment.services.payment_service import PaymentService

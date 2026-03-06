@@ -48,10 +48,11 @@ class InvoiceTest(TestCase):
         self.assertIsNotNone(invoice)
         self.assertEqual(invoice.name, "Facture TEST-001")
         self.assertEqual(invoice.contact_id.contact_id, self.contact.contact_id)
-        self.assertEqual(invoice.status, "En attente")
+        self.assertEqual(invoice.status, "Brouillon")
+        self.assertIsNotNone(invoice.created_at)
 
     def test_invoice_default_status(self):
-        """Test que le statut par défaut est 'En attente'"""
+        """Test que le statut par défaut est 'Brouillon'"""
         invoice = self.invoice_service.create_invoice(
             contact_id=self.contact.contact_id,
             name="Facture TEST-002",
@@ -64,7 +65,7 @@ class InvoiceTest(TestCase):
             phone="0123456789"
         )
 
-        self.assertEqual(invoice.status, "En attente")
+        self.assertEqual(invoice.status, "Brouillon")
 
     def test_invoice_creation_with_invalid_contact(self):
         """Test la création d'une facture avec un contact invalide"""
@@ -234,7 +235,7 @@ class InvoiceTest(TestCase):
         )
 
         # Test statut initial
-        self.assertEqual(invoice.status, "En attente")
+        self.assertEqual(invoice.status, "Brouillon")
 
         # Test mise à jour avec statut payé
         updated = self.invoice_service.update_invoice(
