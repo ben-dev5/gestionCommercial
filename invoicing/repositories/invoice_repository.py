@@ -6,7 +6,7 @@ class InvoiceRepository:
     def __init__(self):
         pass
 
-    def create_invoice(self, contact_id, name, address, city, state, zip_code, siret, email, phone, status='Brouillon', created_at=None):
+    def create_invoice(self, contact_id, name, address, city, state, zip_code, siret, email, phone, price_ht=0, tax=0, status='Brouillon', created_at=None):
         """Créer une nouvelle facture"""
         invoice = Invoice.objects.create(
             contact_id_id=contact_id,
@@ -20,8 +20,8 @@ class InvoiceRepository:
             phone=phone,
             id_product=0,
             description_products='',
-            price_ht=0,
-            tax=0,
+            price_ht=price_ht,
+            tax=tax,
             status=status,
             created_at=timezone.now()
         )

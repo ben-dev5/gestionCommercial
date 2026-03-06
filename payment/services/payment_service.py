@@ -11,6 +11,7 @@ class PaymentService:
         # Vérifier que facture n'est pas en statut "Brouillon" ou "Annulée" avant de créer un paiement
         if self.repo.get_invoice_status(invoice_id) in ['Brouillon', 'Annulée']:
             return {'success': False, 'error': "Impossible de créer un paiement pour une facture en statut 'Brouillon' ou 'Annulée'. Veuillez vérifier le statut de la facture avant de créer un paiement."}
+
         # Vérifier que le reste à payer est supérieur à 0 avant de créer un paiement
         if self.repo.get_state_invoice_payment(invoice_id):
             return {'success': False, 'error': "Impossible de créer un paiement pour une facture déjà payée. Veuillez vérifier le statut de la facture avant de créer un paiement."}

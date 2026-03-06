@@ -147,7 +147,13 @@ class CreateInvoiceFromSalesOrderView(TemplateView):
                 messages.error(request, "Impossible de créer une facture sans lignes.")
                 return redirect('sales:sales_order_detail', pk=sales_order_pk)
 
-            # Créer la facture avec les données du contact
+            # Calculer le price_ht et tax totaux à partir des lignes
+            total_price_ht = sum(line.price_ht * line.quantity for line in sales_lines)
+            # Prendre la taxe de la première ligne (supposée être la même pour toutes)
+            tax = sales_lines[0].tax if sales_lines else 0
+
+
+            # Créer la facture avec les données du contact et les totaux calculés
             contact = sales_order.contact_id
             invoice = invoice_service.create_invoice(
                 contact_id=contact.contact_id,
@@ -158,7 +164,9 @@ class CreateInvoiceFromSalesOrderView(TemplateView):
                 zip_code=contact.zip_code,
                 siret=contact.siret,
                 email=contact.email,
-                phone=contact.phone
+                phone=contact.phone,
+                price_ht=int(total_price_ht),
+                tax=int(tax)
             )
 
             # Copier les lignes du devis/commande vers la facture

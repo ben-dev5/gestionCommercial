@@ -31,12 +31,12 @@ class InvoiceService:
         if not zip_code or zip_code.strip() == "":
             raise ValueError("Le code postal ne peut pas être vide")
 
-    def create_invoice(self, contact_id, name, address, city, state, zip_code, siret, email, phone, status='Brouillon', created_at=None):
+    def create_invoice(self, contact_id, name, address, city, state, zip_code, siret, email, phone, price_ht=0, tax=0, status='Brouillon', created_at=None):
         """Créer une nouvelle facture"""
         self.validate_invoice_data(contact_id, name, address, city, state, zip_code, siret, email, phone)
         # Extraire l'ID du DTO (contact_service retourne un ContactDTO)
         contact_dto = self.contact_service.get_contact_by_id(contact_id)
-        return self.repo.create_invoice(contact_dto.contact_id, name, address, city, state, zip_code, siret, email, phone, status, created_at)
+        return self.repo.create_invoice(contact_dto.contact_id, name, address, city, state, zip_code, siret, email, phone, price_ht, tax, status, created_at)
 
     def delete_invoice(self, invoice_id):
         """Supprimer une facture"""
