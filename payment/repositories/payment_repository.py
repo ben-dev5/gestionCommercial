@@ -56,8 +56,7 @@ class PaymentRepository:
         payment = Payment.objects.get(payment_id=payment_id)
         return payment.state_payment
 
-    def is_invoice_fully_paid(self, invoice_id):
-        """Vérifier si une facture est entièrement payée"""
+    def get_state_invoice_payment(self, invoice_id):
+        """Récupérer le statut de paiement d'une facture par son ID"""
         invoice = Invoice.objects.get(invoice_id=invoice_id)
-        total_paid = sum(payment.amount for payment in invoice.payments.all())
-        return total_paid >= invoice.total_amount
+        return invoice.is_paid
