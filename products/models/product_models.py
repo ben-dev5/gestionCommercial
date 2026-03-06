@@ -9,6 +9,7 @@ class Product(models.Model):
     )
 
     product_id = models.AutoField(primary_key=True)
+    slug = models.SlugField(null=True)
     product_description = models.TextField(max_length=40, unique=True)
     price_ht = models.DecimalField(max_digits=10, decimal_places=2)
     tax = models.DecimalField(max_digits=5, decimal_places=2)

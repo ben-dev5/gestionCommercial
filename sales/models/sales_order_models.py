@@ -15,6 +15,7 @@ STATUS_CHOICES = (
 
 class SalesOrder(models.Model):
     sales_order_id = models.AutoField(primary_key=True)
+    slug = models.SlugField(null=True)
     contact_id = models.ForeignKey(Contact, on_delete=models.CASCADE)
     genre = models.CharField(max_length=30)
     type = models.CharField(max_length=30, choices=TYPE_CHOICES, default='Devis')

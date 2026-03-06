@@ -21,6 +21,23 @@
                             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
                     {% endif %}
+
+                    <!-- Affichage du statut de paiement réel -->
+                    {% if payment_status %}
+                        <div class="mb-3">
+                            <strong>Statut de paiement :</strong>
+                            {% if payment_status == 'Payé' %}
+                                <span class="badge bg-success">{{ payment_status }}</span>
+                            {% elif payment_status == 'En cours' %}
+                                <span class="badge bg-warning">{{ payment_status }}</span>
+                            {% elif payment_status == 'En attente' %}
+                                <span class="badge bg-secondary">{{ payment_status }}</span>
+                            {% else %}
+                                <span class="badge bg-light text-dark">{{ payment_status }}</span>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+
                     {% if payments %}
                         <div class="table-responsive">
                             <table class="table table-striped table-hover">
@@ -53,7 +70,7 @@
                                             </td>
                                             <td>{{ payment.created_at|date:"d/m/Y H:i" }}</td>
                                             <td>
-                                                <form method="post" action="{% url 'payment:payment_delete' payment.payment_id %}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce paiement ?');">
+                                                <form method="post" action="{% url 'payment:payment_delete' payment.payment_id %}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce paiement ?');" style="display:inline;">
                                                     {% csrf_token %}
                                                     <input type="hidden" name="invoice_id" value="{{ invoice_id }}">
                                                     <button type="submit" class="btn btn-sm btn-outline-danger">
@@ -61,7 +78,6 @@
                                                     </button>
                                                 </form>
                                             </td>
-
                                         </tr>
                                     {% endfor %}
                                 </tbody>
@@ -97,49 +113,49 @@
             </div>
             <!-- Le formulaire s'affiche que si le status n'est pas brouillon ou annulée -->
             {% if invoice.status != 'Brouillon' and invoice.status != 'Annulée' %}
-            <form method="post">
-                {% csrf_token %}
-                <div class="modal-body">
-                    <!-- Champ caché pour l'invoice_id -->
-                    <input type="hidden" name="invoice_id" value="{{ invoice_id }}">
-
-                    <div class="mb-3">
-                        <label for="amount" class="form-label">Montant</label>
-                        <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>
-                    </div>
-                    <div class="mb-3">
-                        <label for="payment_method" class="form-label">Méthode de paiement</label>
-                        <select class="form-select" id="payment_method" name="payment_method" required>
-                            <option value="">Sélectionner une méthode</option>
-                            <option value="Carte bancaire">Carte bancaire</option>
-                            <option value="PayPal">PayPal</option>
-                            <option value="Virement bancaire">Virement bancaire</option>
-                            <option value="Chèque">Chèque</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="state_payment" class="form-label">Status</label>
-                        <select class="form-select" id="state_payment" name="state_payment" required>
-                            <option value="">Sélectionner un status</option>
-                            <option value="En attente">En attente</option>
-                            <option value="En cours">En cours</option>
-                            <option value="Payé">Payé</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-check-circle"></i> Enregistrer
-                    </button>
-                </div>
-            </form>
-                {% else %}
+                <form method="post">
+                    {% csrf_token %}
                     <div class="modal-body">
-                        <div class="alert alert-warning" role="alert">
-                            <i class="bi bi-exclamation-triangle"></i> Impossible d'ajouter un paiement tant que la facture est au statut "Brouillon" ou "Annulée". Veuillez d'abord valider la facture.
+                        <!-- Champ caché pour l'invoice_id -->
+                        <input type="hidden" name="invoice_id" value="{{ invoice_id }}">
+
+                        <div class="mb-3">
+                            <label for="amount" class="form-label">Montant</label>
+                            <input type="number" class="form-control" id="amount" name="amount" step="0.01" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="payment_method" class="form-label">Méthode de paiement</label>
+                            <select class="form-select" id="payment_method" name="payment_method" required>
+                                <option value="">Sélectionner une méthode</option>
+                                <option value="Carte bancaire">Carte bancaire</option>
+                                <option value="PayPal">PayPal</option>
+                                <option value="Virement bancaire">Virement bancaire</option>
+                                <option value="Chèque">Chèque</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="state_payment" class="form-label">Status</label>
+                            <select class="form-select" id="state_payment" name="state_payment" required>
+                                <option value="">Sélectionner un status</option>
+                                <option value="En attente">En attente</option>
+                                <option value="En cours">En cours</option>
+                                <option value="Payé">Payé</option>
+                            </select>
                         </div>
                     </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-check-circle"></i> Enregistrer
+                        </button>
+                    </div>
+                </form>
+            {% else %}
+                <div class="modal-body">
+                    <div class="alert alert-warning" role="alert">
+                        <i class="bi bi-exclamation-triangle"></i> Impossible d'ajouter un paiement tant que la facture est au statut "Brouillon" ou "Annulée". Veuillez d'abord valider la facture.
+                    </div>
+                </div>
             {% endif %}
         </div>
     </div>

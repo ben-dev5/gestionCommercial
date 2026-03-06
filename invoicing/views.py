@@ -7,6 +7,7 @@ from sales.services.sales_order_service import SalesOrderService
 from sales.services.sales_order_line_service import SalesOrderLineService
 from django.http import FileResponse
 from sales.sales_order_pdf import SalesOrderPDFService
+from payment.services.payment_service import PaymentService
 import csv
 import logging
 from decimal import Decimal, InvalidOperation
@@ -41,6 +42,7 @@ class InvoiceDetailView(TemplateView):
         pk = self.kwargs.get('pk')
         invoice_service = InvoiceService()
         invoice_line_service = InvoiceOrderLineService()
+        payment_service = PaymentService()
 
         try:
             invoice = invoice_service.get_invoice_by_id(pk)
@@ -49,6 +51,9 @@ class InvoiceDetailView(TemplateView):
             # Récupération des paiements
             payments = invoice.payments.all() if hasattr(invoice, 'payments') else []
             total_paid = sum(p.amount for p in payments) if payments else 0
+
+            # Récupérer le statut de paiement réel via le service
+            payment_status = payment_service.get_invoice_payment_status(pk)
 
             # Ajouter le total HT calculé pour chaque ligne et infos paiements
             for line in lines:
@@ -60,6 +65,7 @@ class InvoiceDetailView(TemplateView):
             context['lines'] = lines
             context['payments'] = payments
             context['total_paid'] = total_paid
+            context['payment_status'] = payment_status
             context['has_lines'] = len(lines) > 0
             context['date_form'] = InvoiceDateForm(initial={'created_at': invoice.created_at})
         except:
@@ -82,7 +88,7 @@ class InvoiceDetailView(TemplateView):
                 form = InvoiceDateForm(request.POST)
                 if form.is_valid():
                     new_date = form.cleaned_data['created_at']
-
+            # Gérer le status en fonction de l'État des paiements
             if 'status' in request.POST:
                 new_status = request.POST.get('status')
 

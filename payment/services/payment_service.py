@@ -27,8 +27,44 @@ class PaymentService:
     def get_all_payments(self):
         return self.repo.get_all_payments()
 
+    def get_invoice_payment_status(self, invoice_id):
+        """
+        Déterminer le statut de paiement réel d'une facture.
+        Retourne:
+        - 'Payé' si tous les paiements sont en statut 'Payé' ET le montant total est couvert
+        - 'En attente' s'il y a des paiements en statut 'En attente'
+        - 'En cours' s'il y a des paiements en statut 'En cours'
+        - 'Non payé' si aucun paiement
+        """
+        payments = self.repo.get_payments_by_invoice_id(invoice_id)
+
+        if not payments:
+            return 'Non payé'
+
+        # Vérifier si tous les paiements sont en statut 'Payé'
+        payment_states = [p.state_payment for p in payments]
+
+        # S'il y a des paiements en attente
+        if 'En attente' in payment_states:
+            return 'En attente'
+
+        # S'il y a des paiements en cours
+        if 'En cours ' in payment_states or 'En cours' in payment_states:
+            return 'En cours'
+
+        # Vérifier si la facture est complètement payée
+        if self.repo.get_state_invoice_payment(invoice_id):
+            return 'Payé'
+
+        return 'Non payé'
+
     def get_invoice_status(self, invoice_id):
         """Récupérer le statut d'une facture par son ID"""
+
+        # Ne comptabilise pas les paiements si les paiements sont en statut "En attente" ou "En cours"
+        if self.repo.get_state_invoice_payment(invoice_id):
+            return "Payé"
+
         return self.repo.get_invoice_status(invoice_id)
 
     def update_payment(self, payment_id, payment_method, state_payment, invoice_id, amount):

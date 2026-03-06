@@ -7,6 +7,7 @@ from sales.models.sales_order_models import SalesOrder
 
 class SalesOrderLine(models.Model):
     sales_order_line_id = models.AutoField(primary_key=True)
+    slug = models.SlugField(null=True)
     sales_order_id = models.ForeignKey(SalesOrder, on_delete=models.CASCADE)
     product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
     contact_id = models.ForeignKey(Contact, on_delete=models.CASCADE)

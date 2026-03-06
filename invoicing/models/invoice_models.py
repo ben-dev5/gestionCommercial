@@ -12,6 +12,7 @@ STATUS_CHOICES = (
 
 class Invoice(models.Model):
     invoice_id = models.AutoField(primary_key=True)
+    slug = models.SlugField(null=True)
     contact_id = models.ForeignKey(Contact, on_delete=models.CASCADE)
     name = models.CharField(max_length=30)
     address = models.TextField()

@@ -13,6 +13,7 @@ from products.models.product_models import Product
 
 class InvoiceOrderLine(models.Model):
     invoice_order_line_id = models.AutoField(primary_key=True)
+    slug = models.SlugField(null=True)
     invoice_id = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     product_id = models.ForeignKey(Product, on_delete=models.CASCADE)
     contact_id = models.ForeignKey(Contact, on_delete=models.CASCADE)
