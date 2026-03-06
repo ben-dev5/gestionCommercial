@@ -49,7 +49,7 @@
                  * services/
                  * templates/
                  * views/
-            * purchases/
+            * payments/
                  * models/
                  * repositories/
                  * services/
@@ -63,6 +63,11 @@
                  * views/
             * products/
                 * models/
+                * repositories/
+                * services/
+                * templates/
+                * views/
+            * dashboard/
                 * repositories/
                 * services/
                 * templates/
